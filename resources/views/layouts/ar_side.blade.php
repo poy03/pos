@@ -1,53 +1,17 @@
 <div class="col-sm-2">
-  <label>Controls:</label>
-  <span class="btn btn-primary btn-block" id="add"><span class="glyphicon glyphicon-briefcase"></span> Add Items</span> 
-  <button class="btn btn-primary btn-block" type="button"><span class="glyphicon glyphicon-edit"></span> Edit Items</button>
-  <button class="btn btn-danger btn-block" type="button" id="delete"><span class="glyphicon glyphicon-trash"></span> Delete Items</button>
-
-
-  <label>Category:</label>
-  <select class='form-control' id='cat'>
-    <option value='all'>All</option>
-  </select>
-
-  <label>Supplier:</label>
-  <select class="form-control" id="supplier">
-    <option value="all">All</option>
-  </select>
+<label>Navigation:</label>
 
 
 
-  <label>Sort:</label>
-  <select class='form-control' id='sort'>
-    <option value='A-Z' selected>A-Z</option>
-    <option value='Z-A' >Z-A</option>
-    <option value='Q-R' >Quantity < Reorder Level</option>
-    <option value='Q-D' >Quantity DESC</option>
-    <option value='Q-A' >Quantity ASC</option>
-  </select>
 
 
-    <label>Export to Excel Including:</label>
-    <input type="hidden" name="category" value="">
-    <input type="hidden" name="supplier" value="">
-    <div class="col-md-12">
-        <label><input type="checkbox" name="sub_costprice" value="1" checked> Sub Cost Price</label>
-      </div>
-    <div class="col-md-12">
-        <label><input type="checkbox" name="costprice" value="1" checked> Total Cost Price</label>
-    </div>
-    <div class="col-md-12">
-        <label><input type="checkbox" name="srp" value="1" checked> WPP</label>
-    </div>
-    <div class="col-md-12">
-        <label><input type="checkbox" name="std_price_to_trade_terms" value="1" checked> STD Price to Terms</label>
-    </div>
-      <div class="col-md-12">
-        <label><input type="checkbox" name="std_price_to_trade_cod" value="1" checked> STD Price to COD</label>
-    </div>
-      <div class="col-md-12">
-        <label><input type="checkbox" name="price_to_distributors" value="1" checked> Price to Distributors</label>
-    </div>
-      <button class="btn btn-block btn-primary" name="export" type="submit"><span class="glyphicon glyphicon-file"></span> Export</button>
 
+<a href = "ar" class = "list-group-item <?php echo ($tab=="ar"?"active":""); ?>">Accounts Receivable</a>
+<a href = "due" class = "list-group-item <?php echo ($tab=="due"?"active":""); ?>">Due <span class="badge"></span></a>
+<a href = "30due" class = "list-group-item <?php echo ($tab=="30due"?"active":""); ?>" data-balloon="(1-30 Days)" data-balloon-pos="down">Past Due<span class="badge"></span></a>
+<a href = "60due" class = "list-group-item <?php echo ($tab=="60due"?"active":""); ?>" data-balloon="(31-60 Days)" data-balloon-pos="down">Past Due<span class="badge"></span></a>
+<a href = "61due" class = "list-group-item <?php echo ($tab=="61due"?"active":""); ?>" data-balloon="(over 61 Days)" data-balloon-pos="down">Past Due<span class="badge"></span></a>
+<a href = "cashpaid" class = "list-group-item <?php echo ($tab=="cashpaid"?"active":""); ?>">Paid with Cash</a>
+<a href = "pdcpaid" class = "list-group-item <?php echo ($tab=="pdcpaid"?"active":""); ?>">Paid with PDC</a>
+<li class = "list-group-item"><input type="text" placeholder="Search DR" class="form-control"></li> 
 </div>

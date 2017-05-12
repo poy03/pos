@@ -17,6 +17,11 @@ Route::get('/', function () {
 
 Route::get('items','Items_controller@index');
 Route::get('customers','Customers_controller@index');
+Route::get('salesman','Salesman_controller@index');
 Route::get('users','Users_controller@index');
 Route::get('suppliers','Suppliers_controller@index');
 Route::get('reports','Reports_controller@index');
+Route::get('receivables/{tab}','Ar_controller@index');
+Route::get('receivables','Ar_controller@index');
+Route::get('payables','Ap_controller@index');
+Route::get('expenses','Expenses_controller@index');
