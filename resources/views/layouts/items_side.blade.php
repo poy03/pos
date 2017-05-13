@@ -1,6 +1,6 @@
 <div class="col-sm-2">
   <label>Controls:</label>
-  <span class="btn btn-primary btn-block" id="add"><span class="glyphicon glyphicon-briefcase"></span> Add Items</span> 
+  <button class="btn btn-primary btn-block" onclick="$('#add-items-modal').modal('show')"><span class="glyphicon glyphicon-briefcase"></span> Add Items</button> 
   <button class="btn btn-primary btn-block" type="button"><span class="glyphicon glyphicon-edit"></span> Edit Items</button>
   <button class="btn btn-danger btn-block" type="button" id="delete"><span class="glyphicon glyphicon-trash"></span> Delete Items</button>
 

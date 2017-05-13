@@ -33,23 +33,23 @@
     <div class="collapse navbar-collapse" id="pos-navbar">
     <ul class="nav navbar-nav">
       <li><a href="/">Home</a></li>
-      <li><a href="items">Items</a></li>
-      <li><a href="sales">Sales</a></li>
-      <li><a href="purchases">Purchases</a></li>
-      <li><a href="receivables">Receivables</a></li>
-      <li><a href="expenses">Expenses</a></li>
-      <li><a href="payables">Payables</a></li>
+      <li><a href="/items">Items</a></li>
+      <li><a href="/sales">Sales</a></li>
+      <li><a href="/purchases">Purchases</a></li>
+      <li><a href="/receivables">Receivables</a></li>
+      <li><a href="/expenses">Expenses</a></li>
+      <li><a href="/payables">Payables</a></li>
     </ul>
     <ul class="nav navbar-nav navbar-right">
-    <li><a href="reports">Reports</a></li>
+    <li><a href="/reports">Reports</a></li>
     <li class="dropdown">
       <a class="dropdown-toggle" data-toggle="dropdown" href="#">
       <span class="caret"></span></a>
       <ul class="dropdown-menu">
-        <li><a href="customers">Customers</a></li>
-        <li><a href="salesman">Salesman</a></li>
-        <li><a href="suppliers">Suppliers</a></li>
-        <li><a href="users">Users</a></li>
+        <li><a href="/customers">Customers</a></li>
+        <li><a href="/salesman">Salesman</a></li>
+        <li><a href="/suppliers">Suppliers</a></li>
+        <li><a href="/users">Users</a></li>
 
         <li><a href="#" id="app-settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
         <li><a href="#" id="app-settings"><span class="glyphicon glyphicon-cog"></span> Maintenance</a></li>
@@ -68,10 +68,11 @@
 	</div>
 
 </div>
+@yield('modals')
 <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
 <script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/assets/js/jquery-ui.min.js"></script>
-<script type="text/javascript" src="/assets/semantic-ui/semantic.js"></script>
+<!-- <script type="text/javascript" src="/assets/semantic-ui/semantic.js"></script> -->
 <script type="text/javascript" src="/assets/semantic-ui/components/dropdown.js"></script>
 <script type="text/javascript" src="/assets/semantic-ui/components/transition.js"></script>
 <script type="text/javascript" src="/assets/js/moment.js"></script>

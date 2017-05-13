@@ -18,7 +18,6 @@
         <th>TIN ID</th>
         <th>Credit Limit</th>
         <th>Credit Term</th>
-        <th>{{$tab}}</th>
       </tr>
     </thead>
     <tbody>

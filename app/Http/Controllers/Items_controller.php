@@ -12,4 +12,10 @@ class Items_controller extends Controller
     {
     	 return view('items');
     }
+
+    public function store(Requests $request)
+    {
+    	 $category = $request->category;
+    	 echo $category;
+    }
 }

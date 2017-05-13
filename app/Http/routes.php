@@ -16,6 +16,7 @@ Route::get('/', function () {
 });
 
 Route::get('items','Items_controller@index');
+Route::post('items','Items_controller@store');
 Route::get('customers','Customers_controller@index');
 Route::get('salesman','Salesman_controller@index');
 Route::get('users','Users_controller@index');
