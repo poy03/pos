@@ -13,6 +13,7 @@ return [
     |
     */
 
+    'available'             => 'The test is foo',
     'accepted'             => 'The :attribute must be accepted.',
     'active_url'           => 'The :attribute is not a valid URL.',
     'after'                => 'The :attribute must be a date after :date.',
@@ -108,6 +109,35 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'category' => 'Category',
+        'itemname' => 'Item Name',
+        'item_code' => 'Item Code',
+        'supplierID' => 'Supplier Name',
+        'unit_of_measure' => 'Unit of measure',
+        'costprice' => 'Cost Price',
+        'srp' => 'WPP',
+        'std_price_to_trade_terms' => 'Price to Trade (terms)',
+        'std_price_to_trade_cod' => 'Price to Trade (COD)',
+        'price_to_distributors' => 'Price to Distributors',
+        'quantity' => 'Quantity',
+        'reorder' => 'Reorder Level',
+        'companyname' => 'Company Name',
+        'address' => 'Address',
+        'email' => 'Email Address',
+        'phone' => 'Phone',
+        'contactperson' => 'Contact Person',
+        'tin_id' => 'TIN ID',
+        'credit_limit' => 'Credit Limit',
+        'term' => 'terms',
+
+        
+        
+        
+        
+        
+        
+        
+    ],
 
 ];
