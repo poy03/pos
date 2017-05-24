@@ -64,4 +64,27 @@ class Customers_controller extends Controller
 
         return $data;
     }
+
+    public function show($customerID)
+    {
+        $customers = new Customers;
+        return $customers->where('customerID',$customerID)->get();
+    }
+    public function update($customerID,Request $request)
+    {
+        $customers = new Customers;
+        $customers
+        ->where('customerID',$customerID)
+        ->update([
+            'companyname' => htmlspecialchars(trim($request->companyname)),
+            'address' => htmlspecialchars(trim($request->address)),
+            'email' => htmlspecialchars(trim($request->email)),
+            'phone' => htmlspecialchars(trim($request->phone)),
+            'contactperson' => htmlspecialchars(trim($request->contactperson)),
+            'tin_id' => htmlspecialchars(trim($request->tin_id)),
+            'credit_limit' => htmlspecialchars(trim($request->credit_limit)),
+            ]);
+        $customers = new Customers;
+        return $customers->where('customerID',$customerID)->get();
+    }
 }

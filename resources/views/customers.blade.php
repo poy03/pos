@@ -184,7 +184,7 @@ $(document).ready(function() {  $("#add-customers-form").submit(function(e) {
         $("#customers-table tbody").html("");
       },
       success: function(data) {
-        $.each(data.result, function(i, item) {
+        for (var i = 0; i < data.result.length; i++) {
           $('#customers-table tbody').append('\
             <tr>\
               <td><input type="checkbox" value="'+data.result[i].itemID+'" name="selected[]" class="select"></td>\
@@ -198,7 +198,7 @@ $(document).ready(function() {  $("#add-customers-form").submit(function(e) {
               <td>'+data.result[i].term+'</td>\
             </tr>\
             ');
-        });
+        }
       }
     });
   }
