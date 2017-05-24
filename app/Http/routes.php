@@ -18,9 +18,13 @@ Route::get('/', function () {
 Route::get('items','Items_controller@index');
 Route::get('items/list','Items_controller@get_list');
 Route::post('items','Items_controller@store');
+
 Route::get('customers','Customers_controller@index');
 Route::get('customers/list','Customers_controller@get_list');
+Route::get('customers/{customer}','Customers_controller@show');
+Route::put('customers/{customer}','Customers_controller@update');
 Route::post('customers','Customers_controller@store');
+
 Route::get('salesman','Salesman_controller@index');
 Route::get('users','Users_controller@index');
 Route::get('suppliers','Suppliers_controller@index');
