@@ -69,13 +69,13 @@
         <th>Item Name</th>
         <th>Item Code</th>
         <th>UOM</th>
-        <th>Remaining Quantity</th>
-        <th>Sub Cost Price</th>
+        <th>Cost Price</th>
         <th>Total Cost Price</th>
-        <th>WPP</th>
-        <th>STD Price to Trade (Terms):</th>
-        <th>STD Price to Trade (COD):</th>
-        <th>Price to Distributors:</th>
+        <th>SRP</th>
+        <!-- <th>STD Price to Trade (Terms):</th> -->
+        <!-- <th>STD Price to Trade (COD):</th> -->
+        <th>Dealers:</th>
+        <th>Qty</th>
         <th class='prints'>Reorder Level</th>
       </tr>
     </thead>
@@ -165,7 +165,8 @@
         </div>
         </div>
 
-        <div class='form-group'>
+<!--
+         <div class='form-group'>
           <label for="std_price_to_trade_terms" class='col-md-2'>STD Price to Trade (Terms):</label>
         <div class='col-md-10'>
           <input step='0.01' min='0' max='99999999' type='number' class='form-control' name='std_price_to_trade_terms' placeholder='STD Price to Trade (Terms)'>
@@ -180,6 +181,7 @@
           <p class="help-block" id="std_price_to_trade_cod-help-block"></p>
         </div>
         </div>
+-->
 
         <div class='form-group'>
           <label for="price_to_distributors" class='col-md-2'>Price to Distributors:</label>
@@ -217,10 +219,144 @@
 </div>
 </div>
 
+
+
+
+<!--Edit Items -->
+<div id="edit-items-modal" class="modal fade" role="dialog" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h4 class="modal-title">Add Items</h4>
+    </div>
+      <div class="modal-body">
+        <p>
+        <form action="/items" method="post" class="form-horizontal" id="edit-items-form">
+        {{ csrf_field() }}
+        <div class='form-group ui-widget'>
+        <input type='hidden' class='edit-field' name='itemID'>
+          <label for="category" class='col-md-2'>Category:</label>
+        <div class='col-md-10'>
+          <input type='text' class='form-control search edit-field' id='category' name='category' placeholder='Category' autocomplete='off'>
+          <p class="help-block" id="edit-category-help-block"></p>
+        </div>
+
+        </div>
+
+        <div class='form-group'>
+          <label for="itemname" class='col-md-2'>Item Name:</label>
+        <div class='col-md-10'>
+          <input type='text' class='form-control edit-field' name='itemname' placeholder='Item Name'>
+          <p class="help-block" id="edit-itemname-help-block"></p>
+        </div>
+        </div>
+
+
+        <div class='form-group'>
+          <label for="item_code" class='col-md-2'>Item Code:</label>
+        <div class='col-md-10'>
+          <input type='text' class='form-control edit-field' name='item_code' placeholder='Item Code'>
+          <p class="help-block" id="edit-item_code-help-block"></p>
+        </div>
+        </div>
+
+        <div class='form-group'>
+          <label for="supplierID" class='col-md-2'>SupplierID:</label>
+        <div class='col-md-10'>
+          <select name="supplierID" class="form-control edit-field">
+            <option value="">Select SupplierID</option>
+            <option value="1">1</option>
+          </select>
+          <p class="help-block" id="edit-supplierID-help-block"></p>
+        </div>
+        </div>
+
+        <div class='form-group'>
+          <label for="unit_of_measure" class='col-md-2'>Unit of Measurement:</label>
+        <div class='col-md-10'>
+          <input type='text' class='form-control edit-field' name='unit_of_measure' placeholder='Unit of Measurement'>
+          <p class="help-block" id="edit-unit_of_measure-help-block"></p>
+        </div>
+        </div>
+
+        <div class='form-group'>
+          <label for="costprice" class='col-md-2'>Sub Cost Price:</label>
+        <div class='col-md-10'>
+          <input step='0.01' min='0' max='99999999' type='number' class='form-control edit-field' name='costprice' placeholder='Sub Cost Price'>
+          <p class="help-block" id="edit-costprice-help-block"></p>
+        </div>
+        </div>
+
+        <div class='form-group'>
+          <label for="srp" class='col-md-2'>WPP:</label>
+        <div class='col-md-10'>
+          <input step='0.01' min='0' max='99999999' type='number' class='form-control edit-field' name='srp' placeholder='WPP'>
+          <p class="help-block" id="edit-srp-help-block"></p>
+        </div>
+        </div>
+
+<!--
+         <div class='form-group'>
+          <label for="std_price_to_trade_terms" class='col-md-2'>STD Price to Trade (Terms):</label>
+        <div class='col-md-10'>
+          <input step='0.01' min='0' max='99999999' type='number' class='form-control edit-field' name='std_price_to_trade_terms' placeholder='STD Price to Trade (Terms)'>
+          <p class="help-block" id="edit-std_price_to_trade_terms-help-block"></p>
+        </div>
+        </div>
+
+        <div class='form-group'>
+          <label for="std_price_to_trade_cod" class='col-md-2'>STD Price to Trade (COD):</label>
+        <div class='col-md-10'>
+          <input step='0.01' min='0' max='99999999' type='number' class='form-control edit-field' name='std_price_to_trade_cod' placeholder='STD Price to Trade (COD)'>
+          <p class="help-block" id="edit-std_price_to_trade_cod-help-block"></p>
+        </div>
+        </div>
+-->
+
+        <div class='form-group'>
+          <label for="price_to_distributors" class='col-md-2'>Price to Distributors:</label>
+        <div class='col-md-10'>
+          <input step='0.01' min='0' max='99999999' type='number' class='form-control edit-field' name='price_to_distributors' placeholder='Price to Distributors'>
+          <p class="help-block" id="edit-price_to_distributors-help-block"></p>
+        </div>
+        </div>
+
+        <div class='form-group'>
+          <label for="quantity" class='col-md-2'>Quantity:</label>
+        <div class='col-md-10'>
+          <input min='0' max='99999999' type='number' class='form-control edit-field' name='quantity' placeholder='Quantity'>
+          <p class="help-block" id="edit-quantity-help-block"></p>
+        </div>
+        </div>
+
+        <div class='form-group'>
+          <label for="reorder" class='col-md-2'>Reorder Level:</label>
+        <div class='col-md-10'>
+          <input min='0' max='99999999' type='number' class='form-control edit-field' name='reorder' placeholder='Reorder Level'>
+          <p class="help-block" id="edit-reorder-help-block"></p>
+        </div>
+
+        </form>
+        </p>
+      </div>
+    </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" form="edit-items-form">Save</button>
+      </div>
+    </div>
+
+</div>
+</div>
+
 @endsection
 @section('scripts')
 <script type="text/javascript">
-$(document).ready(function() {  $("#add-items-form").submit(function(e) {
+$(document).ready(function() { 
+  $("#add-items-form").submit(function(e) {
     e.preventDefault();
     $.ajax({
       type: "POST",
@@ -228,9 +364,13 @@ $(document).ready(function() {  $("#add-items-form").submit(function(e) {
       data: $("#add-items-form").serialize(),
       cache: false,
       dataType: "json",
+      beforeSend: function() {
+        $('button[form="add-items-form"]').prop("disabled",true);
+      },
       success: function(data) {
         alertify.success(data.itemname + " has been successfuly added.");
         $("#add-items-form")[0].reset();
+        $(".help-block").html("");
         show_items();
       },
       error: function(data) {
@@ -250,6 +390,52 @@ $(document).ready(function() {  $("#add-items-form").submit(function(e) {
           $("#quantity-help-block").html(errors.quantity);
           $("#reorder-help-block").html(errors.reorder);
         }
+      },
+      complete: function() {
+        $('button[form="add-items-form"]').prop("disabled",false);
+      }
+    });
+  });
+
+  $("#edit-items-form").submit(function(e) {
+    e.preventDefault();
+    var itemID = $('input[name="itemID"]').val();
+    $.ajax({
+      type: "PUT",
+      url: "items/"+itemID,
+      data: $("#edit-items-form").serialize(),
+      cache: false,
+      dataType: "json",
+      beforeSend: function() {
+        $('button[form="edit-items-form"]').prop("disabled",true);
+      },
+      success: function(data) {
+        alertify.success(data.itemname + " has been updated.");
+        $("#edit-items-form")[0].reset();
+        $(".help-block").html("");
+        show_items();
+      },
+      error: function(data) {
+        console.log(data);
+        alertify.error(data.responseText);
+        if(data.status = 422){
+          var errors = data.responseJSON;
+          $("#edit-category-help-block").html(errors.category);
+          $("#edit-itemname-help-block").html(errors.itemname);
+          $("#edit-item_code-help-block").html(errors.item_code);
+          $("#edit-supplierID-help-block").html(errors.supplierID);
+          $("#edit-unit_of_measure-help-block").html(errors.unit_of_measure);
+          $("#edit-costprice-help-block").html(errors.costprice);
+          $("#edit-srp-help-block").html(errors.srp);
+          $("#edit-std_price_to_trade_terms-help-block").html(errors.std_price_to_trade_terms);
+          $("#edit-std_price_to_trade_cod-help-block").html(errors.std_price_to_trade_cod);
+          $("#edit-price_to_distributors-help-block").html(errors.price_to_distributors);
+          $("#edit-quantity-help-block").html(errors.quantity);
+          $("#edit-reorder-help-block").html(errors.reorder);
+        }
+      },
+      complete: function() {
+        $('button[form="edit-items-form"]').prop("disabled",false);
       }
     });
   });
@@ -266,7 +452,8 @@ $(document).ready(function() {  $("#add-items-form").submit(function(e) {
         $("#items-table tbody").html("");
       },
       success: function(data) {
-        $.each(data.result, function(i, item) {
+        for (var i = 0; i < data.result.length; i++) {
+          console.log(data.result[i].category);
           $('#items-table tbody').append('\
             <tr>\
               <td><input type="checkbox" value="'+data.result[i].itemID+'" name="selected[]" class="select"></td>\
@@ -275,20 +462,45 @@ $(document).ready(function() {  $("#add-items-form").submit(function(e) {
               <td style="text-align:left;">'+data.result[i].itemname+'</td>\
               <td style="text-align:center;">'+data.result[i].item_code+'</td>\
               <td style="text-align:center;">'+data.result[i].unit_of_measure+'</td>\
-              <td style="text-align:center;">'+data.result[i].quantity+'</td>\
               <td style="text-align:right;">'+data.result[i].costprice+'</td>\
               <td style="text-align:right;">'+data.result[i].total_costprice+'</td>\
               <td style="text-align:right;">'+data.result[i].srp+'</td>\
-              <td style="text-align:right;">'+data.result[i].std_price_to_trade_terms+'</td>\
-              <td style="text-align:right;">'+data.result[i].std_price_to_trade_cod+'</td>\
               <td style="text-align:right;">'+data.result[i].price_to_distributors+'</td>\
+              <td style="text-align:center;">'+data.result[i].quantity+'</td>\
               <td style="text-align:center;">'+data.result[i].reorder+'</td>\
+              <td><a href="#" class="edit" id="'+data.result[i].itemID+'">Edit</a></td>\
             </tr>\
             ');
-        });
+        }
       }
     });
   }
+
+  $(document).on("click",".edit",function(e) {
+    $.ajax({
+      type: "GET",
+      url: "/items/"+e.target.id,
+      cache: false,
+      dataType: "json",
+      success: function(data) {
+        // console.log(data);
+        $('input[name="itemID"]').val(data.itemID);
+        $('input[name="category"]').val(data.category);
+        $('input[name="itemname"]').val(data.itemname);
+        $('input[name="item_code"]').val(data.item_code);
+        $('select[name="supplierID"]').val(data.supplierID);
+        $('input[name="unit_of_measure"]').val(data.unit_of_measure);
+        $('input[name="costprice"]').val(data.costprice);
+        $('input[name="srp"]').val(data.srp);
+        $('input[name="std_price_to_trade_terms"]').val(data.std_price_to_trade_terms);
+        $('input[name="std_price_to_trade_cod"]').val(data.std_price_to_trade_cod);
+        $('input[name="price_to_distributors"]').val(data.price_to_distributors);
+        $('input[name="quantity"]').val(data.quantity);
+        $('input[name="reorder"]').val(data.reorder);
+        $("#edit-items-modal").modal("show");
+      }
+    })
+  });
 });
 </script>
 @endsection

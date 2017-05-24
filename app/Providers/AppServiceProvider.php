@@ -5,6 +5,8 @@ namespace App\Providers;
 use Validator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests;
+use Illuminate\Http\Request;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -16,12 +18,15 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Validator::extend('available', function($attribute, $value, $parameters, $validator) {
-            $count = DB::table($parameters[0])
-                        ->where("deleted",0)
-                        ->where($parameters[1],$value)
-                        ->count();
-            return ($count == 1?FALSE:TRUE);
+            $db_data = DB::table($parameters[0]);
+            $db_data->where("deleted",0);
+            $db_data->where($parameters[1],$value);
+            if(isset($parameters[2])&&isset($parameters[3])){
+                $db_data->where($parameters[2],'<>',$parameters[3]);
+            }
+            return ($db_data->count() == 1?FALSE:TRUE);
         });
+
     }
 
     /**

@@ -29,13 +29,13 @@ class Customers_controller extends Controller
 
 
     	$customers = new Customers;
-    	$customers->companyname = htmlspecialchars(trim($request->companyname));
-    	$customers->address = htmlspecialchars(trim($request->address));
-    	$customers->email = htmlspecialchars(trim($request->email));
-    	$customers->phone = htmlspecialchars(trim($request->phone));
-    	$customers->contactperson = htmlspecialchars(trim($request->contactperson));
-    	$customers->tin_id = htmlspecialchars(trim($request->tin_id));
-    	$customers->credit_limit = htmlspecialchars(trim($request->credit_limit));
+    	$customers->companyname = $request->companyname;
+    	$customers->address = $request->address;
+    	$customers->email = $request->email;
+    	$customers->phone = $request->phone;
+    	$customers->contactperson = $request->contactperson;
+    	$customers->tin_id = $request->tin_id;
+    	$customers->credit_limit = $request->credit_limit;
 
     	$customers->save();
     	return $customers->orderBy("customerID","DESC")->get()->first();
