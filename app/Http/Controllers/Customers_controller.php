@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use DB;
 use App\Http\Requests;
 use Validator;
 use App\Customers;
@@ -18,27 +18,29 @@ class Customers_controller extends Controller
     public function store(Request $request)
     {
     	$this->validate($request, [
-    	    'companyname' => 'required|max:100',
+    	    'companyname' => 'required|max:100|available:tbl_customer,companyname',
     	    'address' => 'max:50',
     	    'email' => 'email|max:50',
     	    'phone' => 'max:50',
     	    'contactperson' => 'max:50',
     	    'tin_id' => 'max:200',
-    	    'credit_limit' => 'numeric',
+            'credit_limit' => 'numeric',
+    	    'term' => 'numeric',
     	]);
 
 
     	$customers = new Customers;
-    	$customers->companyname = $request->companyname;
-    	$customers->address = $request->address;
-    	$customers->email = $request->email;
-    	$customers->phone = $request->phone;
-    	$customers->contactperson = $request->contactperson;
-    	$customers->tin_id = $request->tin_id;
-    	$customers->credit_limit = $request->credit_limit;
+    	$customers->companyname = htmlspecialchars(trim($request->companyname));
+    	$customers->address = htmlspecialchars(trim($request->address));
+        $customers->email = htmlspecialchars(trim($request->email));
+        $customers->phone = htmlspecialchars(trim($request->phone));
+        $customers->contactperson = htmlspecialchars(trim($request->contactperson));
+        $customers->tin_id = htmlspecialchars(trim($request->tin_id));
+        $customers->credit_limit = $request->credit_limit;
+    	$customers->term = $request->term;
 
     	$customers->save();
-    	return $customers->orderBy("customerID","DESC")->get()->first();
+    	return $customers->orderBy("customerID","DESC")->first();
     }
 
     public function get_list(Request $request)
@@ -54,7 +56,14 @@ class Customers_controller extends Controller
            ->take($maxitem)
            ->get();
         foreach ($result as $customer_data) {
-        	$customer_data->credit_limit = number_format($customer_data->credit_limit,2);
+            $customer_data->companyname = $customer_data->companyname;
+            $customer_data->address = $customer_data->address;
+            $customer_data->email = $customer_data->email;
+            $customer_data->phone = $customer_data->phone;
+            $customer_data->contactperson = $customer_data->contactperson;
+            $customer_data->tin_id = $customer_data->tin_id;
+            $customer_data->credit_limit = number_format($customer_data->credit_limit,2);
+            $customer_data->term = number_format($customer_data->term);
         }
         $data["getQueryLog"] = DB::getQueryLog();
         $data["result"] = $result;
@@ -68,10 +77,27 @@ class Customers_controller extends Controller
     public function show($customerID)
     {
         $customers = new Customers;
-        return $customers->where('customerID',$customerID)->get();
+        $data = $customers->where('customerID',$customerID)->first();
+        $data->companyname = htmlspecialchars_decode($data->companyname);
+        $data->address = htmlspecialchars_decode($data->address);
+        $data->email = htmlspecialchars_decode($data->email);
+        $data->phone = htmlspecialchars_decode($data->phone);
+        $data->contactperson = htmlspecialchars_decode($data->contactperson);
+        $data->tin_id = htmlspecialchars_decode($data->tin_id);
+        return $data;
     }
     public function update($customerID,Request $request)
     {
+        $this->validate($request, [
+            'companyname' => 'required|max:100|available:tbl_customer,companyname,customerID,'.$customerID,
+            'address' => 'max:50',
+            'email' => 'email|max:50',
+            'phone' => 'max:50',
+            'contactperson' => 'max:50',
+            'tin_id' => 'max:200',
+            'credit_limit' => 'numeric',
+            'term' => 'numeric',
+        ]);
         $customers = new Customers;
         $customers
         ->where('customerID',$customerID)
@@ -83,8 +109,8 @@ class Customers_controller extends Controller
             'contactperson' => htmlspecialchars(trim($request->contactperson)),
             'tin_id' => htmlspecialchars(trim($request->tin_id)),
             'credit_limit' => htmlspecialchars(trim($request->credit_limit)),
+            'term' => htmlspecialchars(trim($request->term)),
             ]);
-        $customers = new Customers;
-        return $customers->where('customerID',$customerID)->get();
+        return $customers->where('customerID',$customerID)->first();
     }
 }

@@ -4,11 +4,18 @@
 
 @section('content')
 <div class="col-sm-2">
-  <label>Controls:</label>
-  <span class="btn btn-primary btn-block" onclick="$('#add-customers-modal').modal('show')"><span class="glyphicon glyphicon-user"></span> Add Customer</span>  
-  <button class="btn btn-primary btn-block" type="button"><span class="glyphicon glyphicon-edit"></span> Edit Customers</button>
-  <button class="btn btn-danger btn-block" type="button" id="delete"><span class="glyphicon glyphicon-trash"></span> Delete Customers</button>
-  <input type="text" placeholder="Search for Customer" class="form-control">
+  <div class="form-group">
+    <label>Controls:</label>
+    <button class="btn btn-primary btn-block btn-add-customers">
+      <span class="glyphicon glyphicon-user"></span> Add Customer
+    </button>
+    <button class="btn btn-danger btn-block" type="button" id="delete">
+      <span class="glyphicon glyphicon-trash"></span> Delete Customers
+    </button>
+  </div>
+  <div class="form-group">
+    <input type="text" placeholder="Search for Customer" class="form-control">
+  </div>
 </div>
 
 <div class="col-sm-10">
@@ -38,9 +45,8 @@
 
 @section('modals')
 
-
-<!--Add Items -->
-<div id="add-customers-modal" class="modal fade" role="dialog" tabindex="-1">
+<!--Add Customer -->
+<div id="edit-customers-modal" class="modal fade" role="dialog" tabindex="-1">
   <div class="modal-dialog modal-lg">
 
     <!-- Modal content-->
@@ -50,82 +56,79 @@
       <h4 class="modal-title">Add Customers</h4>
     </div>
       <div class="modal-body">
-        <p>
-        <form action="customers" method="post" class="form-horizontal" id="add-customers-form">  
+        <form action="customers" method="post" class="form-horizontal" id="edit-customers-form">  
         {{ csrf_field() }}
-
+        <input type="hidden" name="customerID">
         <div class="form-group">
           <label for="companyname" class="col-md-2">Company Name:</label>
-        <div class="col-md-10">
-          <input type="text" class="form-control" name="companyname" placeholder="Company Name">
-          <p class="help-block" id="companyname-help-block"></p>
-        </div>
+          <div class="col-md-10">
+            <input type="text" class="form-control edit-field" name="companyname" placeholder="Company Name">
+            <p class="help-block" id="edit-companyname-help-block"></p>
+          </div>
         </div>
         
         <div class="form-group">
           <label for="address" class="col-md-2">Address:</label>
-        <div class="col-md-10">
-          <input type="text" class="form-control" name="address" placeholder="Address">
-          <p class="help-block" id="address-help-block"></p>
-        </div>
+          <div class="col-md-10">
+            <input type="text" class="form-control edit-field" name="address" placeholder="Address">
+            <p class="help-block" id="edit-address-help-block"></p>
+          </div>
         </div>
         
         <div class="form-group">
           <label for="email" class="col-md-2">Email:</label>
-        <div class="col-md-10">
-          <input type="text" class="form-control" name="email" placeholder="Email">
-          <p class="help-block" id="email-help-block"></p>
-        </div>
+          <div class="col-md-10">
+            <input type="text" class="form-control edit-field" name="email" placeholder="Email">
+            <p class="help-block" id="edit-email-help-block"></p>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="phone" class="col-md-2">Contact Number:</label>
-        <div class="col-md-10">
-          <input type="text" class="form-control" name="phone" placeholder="Contact Number">
-          <p class="help-block" id="phone-help-block"></p>
-        </div>
+          <div class="col-md-10">
+            <input type="text" class="form-control edit-field" name="phone" placeholder="Contact Number">
+            <p class="help-block" id="edit-phone-help-block"></p>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="contactperson" class="col-md-2">Contact Person:</label>
-        <div class="col-md-10">
-          <input type="text" class="form-control" name="contactperson" placeholder="Contact Person">
-          <p class="help-block" id="contactperson-help-block"></p>
-        </div>
+          <div class="col-md-10">
+            <input type="text" class="form-control edit-field" name="contactperson" placeholder="Contact Person">
+            <p class="help-block" id="edit-contactperson-help-block"></p>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="contactperson" class="col-md-2">TIN ID:</label>
-        <div class="col-md-10">
-          <input type="text" class="form-control" name="tin_id" placeholder="TIN ID">
-          <p class="help-block" id="tin_id-help-block"></p>
-        </div>
+          <div class="col-md-10">
+            <input type="text" class="form-control edit-field" name="tin_id" placeholder="TIN ID">
+            <p class="help-block" id="edit-tin_id-help-block"></p>
+          </div>
         </div>
 
 
         <div class="form-group">
           <label for="credit_limit" class="col-md-2">Credit Limit:</label>
-        <div class="col-md-10">
-          <input type="number" step="0.01" min="0" class="form-control" name="credit_limit" placeholder="Credit Limit">
-          <p class="help-block" id="credit_limit-help-block"></p>
-        </div>
+          <div class="col-md-10">
+            <input type="number" step="0.01" min="0" class="form-control edit-field" name="credit_limit" placeholder="Credit Limit">
+            <p class="help-block" id="edit-credit_limit-help-block"></p>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="credit_limit" class="col-md-2">Credit Terms:</label>
-        <div class="col-md-10">
-          <input type="number" step="0.01" min="0" class="form-control" name="term" placeholder="Credit Terms">
-          <p class="help-block" id="term-help-block"></p>
-        </div>
+          <div class="col-md-10">
+            <input type="number" step="0.01" min="0" class="form-control edit-field" name="term" placeholder="Credit Terms">
+            <p class="help-block" id="edit-term-help-block"></p>
+          </div>
         </div>
 
         </form>
-
-        </p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary" form="add-customers-form">Save</button>
+        <button type="submit" class="btn btn-primary" form="edit-customers-form">Save</button>
       </div>
     </div>
 
@@ -135,7 +138,8 @@
 
 @section('scripts')
 <script type="text/javascript">
-$(document).ready(function() {  $("#add-customers-form").submit(function(e) {
+$(document).ready(function() {
+  $("#add-customers-form").submit(function(e) {
     e.preventDefault();
     $.ajax({
       type: "POST",
@@ -172,6 +176,46 @@ $(document).ready(function() {  $("#add-customers-form").submit(function(e) {
     });
   });
 
+
+  $("#edit-customers-form").submit(function(e) {
+    e.preventDefault();
+    var customerID = $('input[name="customerID"]').val();
+    $.ajax({
+      type: "PUT",
+      url: "customers/"+customerID,
+      data: $("#edit-customers-form").serialize(),
+      cache: false,
+      dataType: "json",
+      beforeSend: function() {
+        $(".help-block").html("");
+        $('button[form="edit-customers-form"]').prop("disabled",true);
+      },
+      success: function(data) {
+        alertify.success(data.companyname + " has been updated.");
+        $("#edit-customers-form")[0].reset();
+        show_customers();
+        $("#edit-customers-modal").modal("hide");
+      },
+      error: function(data) {
+        console.log(data);
+        if(data.status = 422){
+          var errors = data.responseJSON;
+          $("#edit-companyname-help-block").html(errors.companyname);
+          $("#edit-address-help-block").html(errors.address);
+          $("#edit-email-help-block").html(errors.email);
+          $("#edit-phone-help-block").html(errors.phone);
+          $("#edit-contactperson-help-block").html(errors.contactperson);
+          $("#edit-tin_id-help-block").html(errors.tin_id);
+          $("#edit-credit_limit-help-block").html(errors.credit_limit);
+          $("#edit-term-help-block").html(errors.term);
+        }
+      },
+      complete: function() {
+        $('button[form="edit-customers-form"]').prop("disabled",false);
+      }
+    });
+  });
+
   show_customers();
   function show_customers(page = 1) {
     $.ajax({
@@ -187,7 +231,7 @@ $(document).ready(function() {  $("#add-customers-form").submit(function(e) {
         for (var i = 0; i < data.result.length; i++) {
           $('#customers-table tbody').append('\
             <tr>\
-              <td><input type="checkbox" value="'+data.result[i].itemID+'" name="selected[]" class="select"></td>\
+              <td><input type="checkbox" value="'+data.result[i].customerID+'" name="selected[]" class="select"></td>\
               <td>'+data.result[i].companyname+'</td>\
               <td>'+data.result[i].address+'</td>\
               <td>'+data.result[i].email+'</td>\
@@ -196,12 +240,34 @@ $(document).ready(function() {  $("#add-customers-form").submit(function(e) {
               <td>'+data.result[i].tin_id+'</td>\
               <td style="text-align:right">'+data.result[i].credit_limit+'</td>\
               <td>'+data.result[i].term+'</td>\
+              <td><a href="#" id="'+data.result[i].customerID+'" class="edit">Edit</a></td>\
             </tr>\
             ');
         }
       }
     });
   }
+
+  $(document).on("click",".edit",function(e) {
+    $.ajax({
+      type: "GET",
+      url: "/customers/"+e.target.id,
+      cache: false,
+      dataType: "json",
+      success: function(data) {
+        $('input[name="customerID"]').val(data.customerID);
+        $('input[name="companyname"].edit-field').val(data.companyname);
+        $('input[name="address"].edit-field').val(data.address);
+        $('input[name="email"].edit-field').val(data.email);
+        $('input[name="phone"].edit-field').val(data.phone);
+        $('input[name="contactperson"].edit-field').val(data.contactperson);
+        $('input[name="tin_id"].edit-field').val(data.tin_id);
+        $('input[name="credit_limit"].edit-field').val(data.credit_limit);
+        $('input[name="term"].edit-field').val(data.term);
+        $("#edit-customers-modal").modal("show");
+      }
+    })
+  });
 });
 </script>
 @endsection

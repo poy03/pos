@@ -4,34 +4,45 @@
 
 @section('content')
 <div class="col-sm-2">
+    
+  <div class="form-group">
   <label>Controls:</label>
-  <button class="btn btn-primary btn-block" onclick="$('#add-items-modal').modal('show')"><span class="glyphicon glyphicon-briefcase"></span> Add Items</button> 
-  <button class="btn btn-primary btn-block" type="button"><span class="glyphicon glyphicon-edit"></span> Edit Items</button>
-  <button class="btn btn-danger btn-block" type="button" id="delete"><span class="glyphicon glyphicon-trash"></span> Delete Items</button>
+    <button class="btn btn-primary btn-block btn-add-items" type="button">
+      <span class="glyphicon glyphicon-briefcase"></span> Add Items
+    </button>
+    <button class="btn btn-danger btn-block" type="button" id="delete">
+      <span class="glyphicon glyphicon-trash"></span> Delete Items
+    </button>
+  </div>
 
 
-  <label>Category:</label>
-  <select class='form-control' id='cat'>
-    <option value='all'>All</option>
-  </select>
+  <div class="form-group">
+    <label>Category:</label>
+    <select class='form-control' id='cat'>
+      <option value='all'>All</option>
+    </select>
+  </div>
 
-  <label>Supplier:</label>
-  <select class="form-control" id="supplier">
-    <option value="all">All</option>
-  </select>
+  <div class="form-group">
+    <label>Supplier:</label>
+    <select class="form-control" id="supplier">
+      <option value="all">All</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Sort:</label>
+    <select class='form-control' id='sort'>
+      <option value='A-Z' selected>A-Z</option>
+      <option value='Z-A' >Z-A</option>
+      <option value='Q-R' >Quantity < Reorder Level</option>
+      <option value='Q-D' >Quantity DESC</option>
+      <option value='Q-A' >Quantity ASC</option>
+    </select>
+  </div>
 
 
-
-  <label>Sort:</label>
-  <select class='form-control' id='sort'>
-    <option value='A-Z' selected>A-Z</option>
-    <option value='Z-A' >Z-A</option>
-    <option value='Q-R' >Quantity < Reorder Level</option>
-    <option value='Q-D' >Quantity DESC</option>
-    <option value='Q-A' >Quantity ASC</option>
-  </select>
-
-
+  <div class="form-group">
     <label>Export to Excel Including:</label>
     <input type="hidden" name="category" value="">
     <input type="hidden" name="supplier" value="">
@@ -54,8 +65,8 @@
         <label><input type="checkbox" name="price_to_distributors" value="1" checked> Price to Distributors</label>
     </div>
       <button class="btn btn-block btn-primary" name="export" type="submit"><span class="glyphicon glyphicon-file"></span> Export</button>
-
-</div>
+    </div>
+  </div>
 
 <div class="col-sm-10">
 <form action=""></form>
@@ -72,8 +83,6 @@
         <th>Cost Price</th>
         <th>Total Cost Price</th>
         <th>SRP</th>
-        <!-- <th>STD Price to Trade (Terms):</th> -->
-        <!-- <th>STD Price to Trade (COD):</th> -->
         <th>Dealers:</th>
         <th>Qty</th>
         <th class='prints'>Reorder Level</th>
@@ -87,141 +96,8 @@
   </div>
 </div>
 @endsection
+
 @section('modals')
-
-
-<!--Add Items -->
-<div id="add-items-modal" class="modal fade" role="dialog" tabindex="-1">
-  <div class="modal-dialog modal-lg">
-
-    <!-- Modal content-->
-    <div class="modal-content">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h4 class="modal-title">Add Items</h4>
-    </div>
-      <div class="modal-body">
-        <p>
-        <form action="/items" method="post" class="form-horizontal" id="add-items-form">
-        {{ csrf_field() }}
-        <div class='form-group ui-widget'>
-          <label for="category" class='col-md-2'>Category:</label>
-        <div class='col-md-10'>
-          <input type='text' class='form-control search' id='category' name='category' placeholder='Category' autocomplete='off'>
-          <p class="help-block" id="category-help-block"></p>
-        </div>
-
-        </div>
-
-        <div class='form-group'>
-          <label for="itemname" class='col-md-2'>Item Name:</label>
-        <div class='col-md-10'>
-          <input type='text' class='form-control' name='itemname' placeholder='Item Name'>
-          <p class="help-block" id="itemname-help-block"></p>
-        </div>
-        </div>
-
-
-        <div class='form-group'>
-          <label for="item_code" class='col-md-2'>Item Code:</label>
-        <div class='col-md-10'>
-          <input type='text' class='form-control' name='item_code' placeholder='Item Code'>
-          <p class="help-block" id="item_code-help-block"></p>
-        </div>
-        </div>
-
-        <div class='form-group'>
-          <label for="supplierID" class='col-md-2'>SupplierID:</label>
-        <div class='col-md-10'>
-          <select name="supplierID" class="form-control">
-            <option value="">Select SupplierID</option>
-            <option value="1">1</option>
-          </select>
-          <p class="help-block" id="supplierID-help-block"></p>
-        </div>
-        </div>
-
-        <div class='form-group'>
-          <label for="unit_of_measure" class='col-md-2'>Unit of Measurement:</label>
-        <div class='col-md-10'>
-          <input type='text' class='form-control' name='unit_of_measure' placeholder='Unit of Measurement'>
-          <p class="help-block" id="unit_of_measure-help-block"></p>
-        </div>
-        </div>
-
-        <div class='form-group'>
-          <label for="costprice" class='col-md-2'>Sub Cost Price:</label>
-        <div class='col-md-10'>
-          <input step='0.01' min='0' max='99999999' type='number' class='form-control' name='costprice' placeholder='Sub Cost Price'>
-          <p class="help-block" id="costprice-help-block"></p>
-        </div>
-        </div>
-
-        <div class='form-group'>
-          <label for="srp" class='col-md-2'>WPP:</label>
-        <div class='col-md-10'>
-          <input step='0.01' min='0' max='99999999' type='number' class='form-control' name='srp' placeholder='WPP'>
-          <p class="help-block" id="srp-help-block"></p>
-        </div>
-        </div>
-
-<!--
-         <div class='form-group'>
-          <label for="std_price_to_trade_terms" class='col-md-2'>STD Price to Trade (Terms):</label>
-        <div class='col-md-10'>
-          <input step='0.01' min='0' max='99999999' type='number' class='form-control' name='std_price_to_trade_terms' placeholder='STD Price to Trade (Terms)'>
-          <p class="help-block" id="std_price_to_trade_terms-help-block"></p>
-        </div>
-        </div>
-
-        <div class='form-group'>
-          <label for="std_price_to_trade_cod" class='col-md-2'>STD Price to Trade (COD):</label>
-        <div class='col-md-10'>
-          <input step='0.01' min='0' max='99999999' type='number' class='form-control' name='std_price_to_trade_cod' placeholder='STD Price to Trade (COD)'>
-          <p class="help-block" id="std_price_to_trade_cod-help-block"></p>
-        </div>
-        </div>
--->
-
-        <div class='form-group'>
-          <label for="price_to_distributors" class='col-md-2'>Price to Distributors:</label>
-        <div class='col-md-10'>
-          <input step='0.01' min='0' max='99999999' type='number' class='form-control' name='price_to_distributors' placeholder='Price to Distributors'>
-          <p class="help-block" id="price_to_distributors-help-block"></p>
-        </div>
-        </div>
-
-        <div class='form-group'>
-          <label for="quantity" class='col-md-2'>Quantity:</label>
-        <div class='col-md-10'>
-          <input min='0' max='99999999' type='number' class='form-control' name='quantity' placeholder='Quantity'>
-          <p class="help-block" id="quantity-help-block"></p>
-        </div>
-        </div>
-
-        <div class='form-group'>
-          <label for="reorder" class='col-md-2'>Reorder Level:</label>
-        <div class='col-md-10'>
-          <input min='0' max='99999999' type='number' class='form-control' name='reorder' placeholder='Reorder Level'>
-          <p class="help-block" id="reorder-help-block"></p>
-        </div>
-
-        </form>
-        </p>
-      </div>
-    </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary" form="add-items-form">Save</button>
-      </div>
-    </div>
-
-</div>
-</div>
-
-
-
-
 <!--Edit Items -->
 <div id="edit-items-modal" class="modal fade" role="dialog" tabindex="-1">
   <div class="modal-dialog modal-lg">
@@ -233,115 +109,95 @@
       <h4 class="modal-title">Add Items</h4>
     </div>
       <div class="modal-body">
-        <p>
         <form action="/items" method="post" class="form-horizontal" id="edit-items-form">
         {{ csrf_field() }}
         <div class='form-group ui-widget'>
         <input type='hidden' class='edit-field' name='itemID'>
           <label for="category" class='col-md-2'>Category:</label>
-        <div class='col-md-10'>
-          <input type='text' class='form-control search edit-field' id='category' name='category' placeholder='Category' autocomplete='off'>
-          <p class="help-block" id="edit-category-help-block"></p>
-        </div>
-
+          <div class='col-md-10'>
+            <input type='text' class='form-control search edit-field' id='category' name='category' placeholder='Category' autocomplete='off'>
+            <p class="help-block" id="edit-category-help-block"></p>
+          </div>
         </div>
 
         <div class='form-group'>
           <label for="itemname" class='col-md-2'>Item Name:</label>
-        <div class='col-md-10'>
-          <input type='text' class='form-control edit-field' name='itemname' placeholder='Item Name'>
-          <p class="help-block" id="edit-itemname-help-block"></p>
-        </div>
+          <div class='col-md-10'>
+            <input type='text' class='form-control edit-field' name='itemname' placeholder='Item Name'>
+            <p class="help-block" id="edit-itemname-help-block"></p>
+          </div>
         </div>
 
 
         <div class='form-group'>
           <label for="item_code" class='col-md-2'>Item Code:</label>
-        <div class='col-md-10'>
-          <input type='text' class='form-control edit-field' name='item_code' placeholder='Item Code'>
-          <p class="help-block" id="edit-item_code-help-block"></p>
-        </div>
+          <div class='col-md-10'>
+            <input type='text' class='form-control edit-field' name='item_code' placeholder='Item Code'>
+            <p class="help-block" id="edit-item_code-help-block"></p>
+          </div>
         </div>
 
         <div class='form-group'>
           <label for="supplierID" class='col-md-2'>SupplierID:</label>
-        <div class='col-md-10'>
-          <select name="supplierID" class="form-control edit-field">
-            <option value="">Select SupplierID</option>
-            <option value="1">1</option>
-          </select>
-          <p class="help-block" id="edit-supplierID-help-block"></p>
-        </div>
+          <div class='col-md-10'>
+            <select name="supplierID" class="form-control edit-field">
+              <option value="">Select SupplierID</option>
+              <option value="1">1</option>
+            </select>
+            <p class="help-block" id="edit-supplierID-help-block"></p>
+          </div>
         </div>
 
         <div class='form-group'>
           <label for="unit_of_measure" class='col-md-2'>Unit of Measurement:</label>
-        <div class='col-md-10'>
-          <input type='text' class='form-control edit-field' name='unit_of_measure' placeholder='Unit of Measurement'>
-          <p class="help-block" id="edit-unit_of_measure-help-block"></p>
-        </div>
+          <div class='col-md-10'>
+            <input type='text' class='form-control edit-field' name='unit_of_measure' placeholder='Unit of Measurement'>
+            <p class="help-block" id="edit-unit_of_measure-help-block"></p>
+          </div>
         </div>
 
         <div class='form-group'>
           <label for="costprice" class='col-md-2'>Sub Cost Price:</label>
-        <div class='col-md-10'>
-          <input step='0.01' min='0' max='99999999' type='number' class='form-control edit-field' name='costprice' placeholder='Sub Cost Price'>
-          <p class="help-block" id="edit-costprice-help-block"></p>
-        </div>
+          <div class='col-md-10'>
+            <input step='0.01' min='0' max='99999999' type='number' class='form-control edit-field' name='costprice' placeholder='Sub Cost Price'>
+            <p class="help-block" id="edit-costprice-help-block"></p>
+          </div>
         </div>
 
         <div class='form-group'>
           <label for="srp" class='col-md-2'>WPP:</label>
-        <div class='col-md-10'>
-          <input step='0.01' min='0' max='99999999' type='number' class='form-control edit-field' name='srp' placeholder='WPP'>
-          <p class="help-block" id="edit-srp-help-block"></p>
-        </div>
-        </div>
-
-<!--
-         <div class='form-group'>
-          <label for="std_price_to_trade_terms" class='col-md-2'>STD Price to Trade (Terms):</label>
-        <div class='col-md-10'>
-          <input step='0.01' min='0' max='99999999' type='number' class='form-control edit-field' name='std_price_to_trade_terms' placeholder='STD Price to Trade (Terms)'>
-          <p class="help-block" id="edit-std_price_to_trade_terms-help-block"></p>
-        </div>
+          <div class='col-md-10'>
+            <input step='0.01' min='0' max='99999999' type='number' class='form-control edit-field' name='srp' placeholder='WPP'>
+            <p class="help-block" id="edit-srp-help-block"></p>
+          </div>
         </div>
 
-        <div class='form-group'>
-          <label for="std_price_to_trade_cod" class='col-md-2'>STD Price to Trade (COD):</label>
-        <div class='col-md-10'>
-          <input step='0.01' min='0' max='99999999' type='number' class='form-control edit-field' name='std_price_to_trade_cod' placeholder='STD Price to Trade (COD)'>
-          <p class="help-block" id="edit-std_price_to_trade_cod-help-block"></p>
-        </div>
-        </div>
--->
 
         <div class='form-group'>
           <label for="price_to_distributors" class='col-md-2'>Price to Distributors:</label>
-        <div class='col-md-10'>
-          <input step='0.01' min='0' max='99999999' type='number' class='form-control edit-field' name='price_to_distributors' placeholder='Price to Distributors'>
-          <p class="help-block" id="edit-price_to_distributors-help-block"></p>
-        </div>
+          <div class='col-md-10'>
+            <input step='0.01' min='0' max='99999999' type='number' class='form-control edit-field' name='price_to_distributors' placeholder='Price to Distributors'>
+            <p class="help-block" id="edit-price_to_distributors-help-block"></p>
+          </div>
         </div>
 
         <div class='form-group'>
           <label for="quantity" class='col-md-2'>Quantity:</label>
-        <div class='col-md-10'>
-          <input min='0' max='99999999' type='number' class='form-control edit-field' name='quantity' placeholder='Quantity'>
-          <p class="help-block" id="edit-quantity-help-block"></p>
-        </div>
+          <div class='col-md-10'>
+            <input min='0' max='99999999' type='number' class='form-control edit-field' name='quantity' placeholder='Quantity'>
+            <p class="help-block" id="edit-quantity-help-block"></p>
+          </div>
         </div>
 
         <div class='form-group'>
           <label for="reorder" class='col-md-2'>Reorder Level:</label>
-        <div class='col-md-10'>
-          <input min='0' max='99999999' type='number' class='form-control edit-field' name='reorder' placeholder='Reorder Level'>
-          <p class="help-block" id="edit-reorder-help-block"></p>
+          <div class='col-md-10'>
+            <input min='0' max='99999999' type='number' class='form-control edit-field' name='reorder' placeholder='Reorder Level'>
+            <p class="help-block" id="edit-reorder-help-block"></p>
+          </div>
         </div>
 
         </form>
-        </p>
-      </div>
     </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -411,9 +267,9 @@ $(document).ready(function() {
       },
       success: function(data) {
         alertify.success(data.itemname + " has been updated.");
-        $("#edit-items-form")[0].reset();
         $(".help-block").html("");
         show_items();
+        $("#edit-items-modal").modal("hide");
       },
       error: function(data) {
         console.log(data);
@@ -453,7 +309,6 @@ $(document).ready(function() {
       },
       success: function(data) {
         for (var i = 0; i < data.result.length; i++) {
-          console.log(data.result[i].category);
           $('#items-table tbody').append('\
             <tr>\
               <td><input type="checkbox" value="'+data.result[i].itemID+'" name="selected[]" class="select"></td>\
@@ -483,20 +338,19 @@ $(document).ready(function() {
       cache: false,
       dataType: "json",
       success: function(data) {
-        // console.log(data);
-        $('input[name="itemID"]').val(data.itemID);
-        $('input[name="category"]').val(data.category);
-        $('input[name="itemname"]').val(data.itemname);
-        $('input[name="item_code"]').val(data.item_code);
-        $('select[name="supplierID"]').val(data.supplierID);
-        $('input[name="unit_of_measure"]').val(data.unit_of_measure);
-        $('input[name="costprice"]').val(data.costprice);
-        $('input[name="srp"]').val(data.srp);
-        $('input[name="std_price_to_trade_terms"]').val(data.std_price_to_trade_terms);
-        $('input[name="std_price_to_trade_cod"]').val(data.std_price_to_trade_cod);
-        $('input[name="price_to_distributors"]').val(data.price_to_distributors);
-        $('input[name="quantity"]').val(data.quantity);
-        $('input[name="reorder"]').val(data.reorder);
+        $('input[name="itemID"].edit-field').val(data.itemID);
+        $('input[name="category"].edit-field').val(data.category);
+        $('input[name="itemname"].edit-field').val(data.itemname);
+        $('input[name="item_code"].edit-field').val(data.item_code);
+        $('select[name="supplierID"].edit-field').val(data.supplierID);
+        $('input[name="unit_of_measure"].edit-field').val(data.unit_of_measure);
+        $('input[name="costprice"].edit-field').val(data.costprice);
+        $('input[name="srp"].edit-field').val(data.srp);
+        $('input[name="std_price_to_trade_terms"].edit-field').val(data.std_price_to_trade_terms);
+        $('input[name="std_price_to_trade_cod"].edit-field').val(data.std_price_to_trade_cod);
+        $('input[name="price_to_distributors"].edit-field').val(data.price_to_distributors);
+        $('input[name="quantity"].edit-field').val(data.quantity);
+        $('input[name="reorder"].edit-field').val(data.reorder);
         $("#edit-items-modal").modal("show");
       }
     })

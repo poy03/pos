@@ -22,12 +22,9 @@ class Items_controller extends Controller
             'category' => 'required|max:100',
             'itemname' => 'required|max:50',
             'item_code' => 'max:200|available:tbl_items,item_code',
-            'supplierID' => 'required',
             'unit_of_measure' => 'required|max:100',
             'costprice' => 'required|numeric',
             'srp' => 'required|numeric',
-            // 'std_price_to_trade_terms' => 'required|numeric',
-            // 'std_price_to_trade_cod' => 'required|numeric',
             'price_to_distributors' => 'required|numeric',
             'quantity' => 'required|numeric',
             'reorder' => 'required|numeric',
@@ -41,14 +38,12 @@ class Items_controller extends Controller
         $items->unit_of_measure = htmlspecialchars(trim($request->unit_of_measure));
         $items->costprice = htmlspecialchars(trim($request->costprice));
         $items->srp = htmlspecialchars(trim($request->srp));
-        // $items->std_price_to_trade_terms = htmlspecialchars(trim($request->std_price_to_trade_terms));
-        // $items->std_price_to_trade_cod = htmlspecialchars(trim($request->std_price_to_trade_cod));
         $items->price_to_distributors = htmlspecialchars(trim($request->price_to_distributors));
         $items->quantity = htmlspecialchars(trim($request->quantity));
         $items->reorder = htmlspecialchars(trim($request->reorder));
 
         $items->save();
-        $item_data = $items->orderBy("itemID","DESC")->get()->first();
+        $item_data = $items->orderBy("itemID","DESC")->first();
 
         $history = new Items_history;
         $history->itemID = $item_data->itemID;
@@ -100,12 +95,6 @@ class Items_controller extends Controller
         $data->category = htmlspecialchars_decode($data->category);
         $data->itemname = htmlspecialchars_decode($data->itemname);
         $data->item_code = htmlspecialchars_decode($data->item_code);
-        $data->total_costprice = number_format($data->costprice * $data->quantity,2);
-        $data->quantity = number_format($data->quantity);
-        $data->costprice = number_format($data->costprice,2);
-        $data->srp = number_format($data->srp,2);
-        $data->price_to_distributors = number_format($data->price_to_distributors,2);
-        $data->reorder = number_format($data->reorder);
         return $data;
     }
 
@@ -115,7 +104,6 @@ class Items_controller extends Controller
             'category' => 'required|max:100',
             'itemname' => 'required|max:50',
             'item_code' => 'max:200|available:tbl_items,item_code,itemID,'.$itemID,
-            'supplierID' => 'required',
             'unit_of_measure' => 'required|max:100',
             'costprice' => 'required|numeric',
             'srp' => 'required|numeric',

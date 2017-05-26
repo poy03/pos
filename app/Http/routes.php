@@ -23,13 +23,25 @@ Route::post('items','Items_controller@store');
 
 Route::get('customers','Customers_controller@index');
 Route::get('customers/list','Customers_controller@get_list');
-Route::get('customers/{customer}','Customers_controller@show');
-Route::put('customers/{customer}','Customers_controller@update');
+Route::get('customers/{id}','Customers_controller@show');
+Route::put('customers/{id}','Customers_controller@update');
 Route::post('customers','Customers_controller@store');
 
 Route::get('salesman','Salesman_controller@index');
-Route::get('users','Users_controller@index');
+Route::get('salesman/list','Salesman_controller@get_list');
+Route::get('salesman/{id}','Salesman_controller@show');
+Route::put('salesman/{id}','Salesman_controller@update');
+Route::post('salesman','Salesman_controller@store');
+
+
 Route::get('suppliers','Suppliers_controller@index');
+Route::get('suppliers/list','Suppliers_controller@get_list');
+Route::get('suppliers/{id}','Suppliers_controller@show');
+Route::put('suppliers/{id}','Suppliers_controller@update');
+Route::post('suppliers','Suppliers_controller@store');
+
+
+Route::get('users','Users_controller@index');
 Route::get('reports','Reports_controller@index');
 Route::get('receivables/{tab}','Ar_controller@index');
 Route::get('receivables','Ar_controller@index');
