@@ -50,11 +50,11 @@ class Customers_controller extends Controller
         $maxitem = $request->maxitem;
         $limit = ($page*$maxitem)-$maxitem;
         $customers = new Customers;
-        $result = $customers->where('deleted', 0)
-           ->orderBy('companyname', 'ASC')
-           ->skip($limit)
-           ->take($maxitem)
-           ->get();
+        $result = $customers->where('deleted', 0);
+        $result->orderBy('companyname', 'ASC');
+        $result->skip($limit);
+        $result->take($maxitem);
+        $result = $result->get();
         foreach ($result as $customer_data) {
             $customer_data->companyname = $customer_data->companyname;
             $customer_data->address = $customer_data->address;
@@ -67,11 +67,17 @@ class Customers_controller extends Controller
         }
         $data["getQueryLog"] = DB::getQueryLog();
         $data["result"] = $result;
-        $data["count"] = $customers->where('deleted', 0)
-            ->orderBy('companyname', 'ASC')
-            ->count();
-
+        $count = $customers->where('deleted', 0);
+        $count->orderBy('companyname', 'ASC');
+        $data["count"] = $count->count();
+        $data["paging"] = paging($page,$count->count(),$maxitem);
         return $data;
+    }
+
+    public function get_companynames()
+    {
+        $customers = new Customers;
+        return $customers->select("companyname")->where("deleted",0)->distinct()->get();
     }
 
     public function show($customerID)

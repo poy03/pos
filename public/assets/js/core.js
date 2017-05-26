@@ -1,5 +1,7 @@
 $(document).ready(function(){
-
+  $('.ui.dropdown').dropdown({
+    forceSelection: false
+  });
   $(".btn-add-items").click(function(e) {
     $('#add-items-modal').modal('show');
   });

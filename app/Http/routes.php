@@ -17,27 +17,29 @@ Route::get('/', function () {
 
 Route::get('items','Items_controller@index');
 Route::get('items/list','Items_controller@get_list');
-Route::get('items/{id}','Items_controller@show');
-Route::put('items/{id}','Items_controller@update');
+Route::get('items/item/{id}','Items_controller@show');
+Route::put('items/item/{id}','Items_controller@update');
 Route::post('items','Items_controller@store');
+Route::get('items/categories','Items_controller@get_categories');
 
 Route::get('customers','Customers_controller@index');
 Route::get('customers/list','Customers_controller@get_list');
-Route::get('customers/{id}','Customers_controller@show');
-Route::put('customers/{id}','Customers_controller@update');
+Route::get('customers/customer/{id}','Customers_controller@show');
+Route::put('customers/customer/{id}','Customers_controller@update');
 Route::post('customers','Customers_controller@store');
+Route::get('customers/companynames','Customers_controller@get_companynames');
 
 Route::get('salesman','Salesman_controller@index');
 Route::get('salesman/list','Salesman_controller@get_list');
-Route::get('salesman/{id}','Salesman_controller@show');
-Route::put('salesman/{id}','Salesman_controller@update');
+Route::get('salesman/salesman/{id}','Salesman_controller@show');
+Route::put('salesman/salesman/{id}','Salesman_controller@update');
 Route::post('salesman','Salesman_controller@store');
 
 
 Route::get('suppliers','Suppliers_controller@index');
 Route::get('suppliers/list','Suppliers_controller@get_list');
-Route::get('suppliers/{id}','Suppliers_controller@show');
-Route::put('suppliers/{id}','Suppliers_controller@update');
+Route::get('suppliers/supplier/{id}','Suppliers_controller@show');
+Route::put('suppliers/supplier/{id}','Suppliers_controller@update');
 Route::post('suppliers','Suppliers_controller@store');
 
 

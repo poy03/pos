@@ -14,33 +14,32 @@
       <span class="glyphicon glyphicon-trash"></span> Delete Items
     </button>
   </div>
-
-
+  <form action="items/get_list" method="get" id="item-sort-form">
+  {{ csrf_field() }}
   <div class="form-group">
     <label>Category:</label>
-    <select class='form-control' id='cat'>
+    <select class='form-control' id="category-select" name="sort_category">
       <option value='all'>All</option>
     </select>
   </div>
 
   <div class="form-group">
     <label>Supplier:</label>
-    <select class="form-control" id="supplier">
+    <select class="form-control" id="supplier-select" name="sort_supplier">
       <option value="all">All</option>
     </select>
   </div>
 
   <div class="form-group">
     <label>Sort:</label>
-    <select class='form-control' id='sort'>
+    <select class='form-control' id="general-sort-select" name="sort_general">
       <option value='A-Z' selected>A-Z</option>
       <option value='Z-A' >Z-A</option>
-      <option value='Q-R' >Quantity < Reorder Level</option>
-      <option value='Q-D' >Quantity DESC</option>
       <option value='Q-A' >Quantity ASC</option>
+      <option value='Q-D' >Quantity DESC</option>
     </select>
   </div>
-
+  </form>
 
   <div class="form-group">
     <label>Export to Excel Including:</label>
@@ -91,6 +90,8 @@
     <tbody>
 
     </tbody>
+    <tfoot>
+    </tfoot>
 
     </table>
   </div>
@@ -196,7 +197,6 @@
             <p class="help-block" id="edit-reorder-help-block"></p>
           </div>
         </div>
-
         </form>
     </div>
       <div class="modal-footer">
@@ -227,7 +227,7 @@ $(document).ready(function() {
         alertify.success(data.itemname + " has been successfuly added.");
         $("#add-items-form")[0].reset();
         $(".help-block").html("");
-        show_items();
+        show_items($("li.active.paging-active a").html());
       },
       error: function(data) {
         console.log(data);
@@ -258,7 +258,7 @@ $(document).ready(function() {
     var itemID = $('input[name="itemID"]').val();
     $.ajax({
       type: "PUT",
-      url: "items/"+itemID,
+      url: "/items/item/"+itemID,
       data: $("#edit-items-form").serialize(),
       cache: false,
       dataType: "json",
@@ -268,7 +268,7 @@ $(document).ready(function() {
       success: function(data) {
         alertify.success(data.itemname + " has been updated.");
         $(".help-block").html("");
-        show_items();
+        show_items($("li.active.paging-active a").html());
         $("#edit-items-modal").modal("hide");
       },
       error: function(data) {
@@ -296,12 +296,46 @@ $(document).ready(function() {
     });
   });
 
+  $(document).on("click",".edit",function(e) {
+    $.ajax({
+      type: "GET",
+      url: "/items/item/"+e.target.id,
+      cache: false,
+      dataType: "json",
+      success: function(data) {
+        $('input[name="itemID"].edit-field').val(data.itemID);
+        $('input[name="category"].edit-field').val(data.category);
+        $('input[name="itemname"].edit-field').val(data.itemname);
+        $('input[name="item_code"].edit-field').val(data.item_code);
+        $('select[name="supplierID"].edit-field').val(data.supplierID);
+        $('input[name="unit_of_measure"].edit-field').val(data.unit_of_measure);
+        $('input[name="costprice"].edit-field').val(data.costprice);
+        $('input[name="srp"].edit-field').val(data.srp);
+        $('input[name="std_price_to_trade_terms"].edit-field').val(data.std_price_to_trade_terms);
+        $('input[name="std_price_to_trade_cod"].edit-field').val(data.std_price_to_trade_cod);
+        $('input[name="price_to_distributors"].edit-field').val(data.price_to_distributors);
+        $('input[name="quantity"].edit-field').val(data.quantity);
+        $('input[name="reorder"].edit-field').val(data.reorder);
+        $("#edit-items-modal").modal("show");
+      }
+    })
+  });
+
+  $(document).on("change","#category-select,#supplier-select,#general-sort-select", function(e) {
+    show_items();
+  });
+
+  $(document).on("click",".paging",function function_name(e) {
+    show_items(e.target.id);
+  });
+
   show_items();
+  show_categories();
   function show_items(page = 1) {
     $.ajax({
       type: "GET",
       url: "/items/list",
-      data: "page="+page+"&maxitem="+50,
+      data: $("#item-sort-form").serialize()+"&page="+page+"&maxitem="+1,
       cache: false,
       dataType: "json",
       beforeSend: function() {
@@ -327,34 +361,27 @@ $(document).ready(function() {
             </tr>\
             ');
         }
+        $("#items-table tfoot").html(data.paging);
       }
     });
   }
-
-  $(document).on("click",".edit",function(e) {
+  function show_categories() {
     $.ajax({
       type: "GET",
-      url: "/items/"+e.target.id,
+      url: "/items/categories",
       cache: false,
       dataType: "json",
+      beforeSend: function() {
+        $("#category-select").html('<option value="all">All</option>');
+      },
       success: function(data) {
-        $('input[name="itemID"].edit-field').val(data.itemID);
-        $('input[name="category"].edit-field').val(data.category);
-        $('input[name="itemname"].edit-field').val(data.itemname);
-        $('input[name="item_code"].edit-field').val(data.item_code);
-        $('select[name="supplierID"].edit-field').val(data.supplierID);
-        $('input[name="unit_of_measure"].edit-field').val(data.unit_of_measure);
-        $('input[name="costprice"].edit-field').val(data.costprice);
-        $('input[name="srp"].edit-field').val(data.srp);
-        $('input[name="std_price_to_trade_terms"].edit-field').val(data.std_price_to_trade_terms);
-        $('input[name="std_price_to_trade_cod"].edit-field').val(data.std_price_to_trade_cod);
-        $('input[name="price_to_distributors"].edit-field').val(data.price_to_distributors);
-        $('input[name="quantity"].edit-field').val(data.quantity);
-        $('input[name="reorder"].edit-field').val(data.reorder);
-        $("#edit-items-modal").modal("show");
+        console.log(data);
+        for (var i = 0; i < data.length; i++) {
+          $('#category-select').append('<option value="'+data[i].category+'">'+data[i].category+'</option>');
+        }
       }
-    })
-  });
+    });
+  }
 });
 </script>
 @endsection

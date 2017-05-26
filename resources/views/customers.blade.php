@@ -14,8 +14,11 @@
     </button>
   </div>
   <div class="form-group">
-    <input type="text" placeholder="Search for Customer" class="form-control">
+     <select class="ui search selection dropdown fluid" id="customer-select">
+       <option value="">Search for Customer Name</option>
+     </select>
   </div>
+
 </div>
 
 <div class="col-sm-10">
@@ -35,8 +38,9 @@
       </tr>
     </thead>
     <tbody>
-
     </tbody>
+    <tfoot>
+    </tfoot>
 
     </table>
   </div>
@@ -182,7 +186,7 @@ $(document).ready(function() {
     var customerID = $('input[name="customerID"]').val();
     $.ajax({
       type: "PUT",
-      url: "customers/"+customerID,
+      url: "/customers/customer/"+customerID,
       data: $("#edit-customers-form").serialize(),
       cache: false,
       dataType: "json",
@@ -216,12 +220,38 @@ $(document).ready(function() {
     });
   });
 
+  $(document).on("click",".paging",function(e) {
+    show_customers(e.target.id);
+  });
+
+  $(document).on("click",".edit",function(e) {
+    $.ajax({
+      type: "GET",
+      url: "/customers/customer/"+e.target.id,
+      cache: false,
+      dataType: "json",
+      success: function(data) {
+        $('input[name="customerID"]').val(data.customerID);
+        $('input[name="companyname"].edit-field').val(data.companyname);
+        $('input[name="address"].edit-field').val(data.address);
+        $('input[name="email"].edit-field').val(data.email);
+        $('input[name="phone"].edit-field').val(data.phone);
+        $('input[name="contactperson"].edit-field').val(data.contactperson);
+        $('input[name="tin_id"].edit-field').val(data.tin_id);
+        $('input[name="credit_limit"].edit-field').val(data.credit_limit);
+        $('input[name="term"].edit-field').val(data.term);
+        $("#edit-customers-modal").modal("show");
+      }
+    })
+  });
+
   show_customers();
+  show_companynames();
   function show_customers(page = 1) {
     $.ajax({
       type: "GET",
       url: "/customers/list",
-      data: "page="+page+"&maxitem="+50,
+      data: "page="+page+"&maxitem="+1,
       cache: false,
       dataType: "json",
       beforeSend: function() {
@@ -244,30 +274,27 @@ $(document).ready(function() {
             </tr>\
             ');
         }
+        $("#customers-table tfoot").html(data.paging);
       }
     });
   }
-
-  $(document).on("click",".edit",function(e) {
+  function show_companynames() {
     $.ajax({
       type: "GET",
-      url: "/customers/"+e.target.id,
+      url: "/customers/companynames",
       cache: false,
       dataType: "json",
+      beforeSend: function() {
+        $("#customer-select").html("");
+        $("#customer-select").append('<option value="">Search for Customer Name</option>');
+      },
       success: function(data) {
-        $('input[name="customerID"]').val(data.customerID);
-        $('input[name="companyname"].edit-field').val(data.companyname);
-        $('input[name="address"].edit-field').val(data.address);
-        $('input[name="email"].edit-field').val(data.email);
-        $('input[name="phone"].edit-field').val(data.phone);
-        $('input[name="contactperson"].edit-field').val(data.contactperson);
-        $('input[name="tin_id"].edit-field').val(data.tin_id);
-        $('input[name="credit_limit"].edit-field').val(data.credit_limit);
-        $('input[name="term"].edit-field').val(data.term);
-        $("#edit-customers-modal").modal("show");
+        for (var i = 0; i < data.length; i++) {
+          $("#customer-select").append('<option value="'+data[i].companyname+'">'+data[i].companyname+'</option>');
+        }
       }
-    })
-  });
+    });
+  }
 });
 </script>
 @endsection

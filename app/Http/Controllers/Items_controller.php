@@ -64,12 +64,34 @@ class Items_controller extends Controller
         $maxitem = $request->maxitem;
         $limit = ($page*$maxitem)-$maxitem;
         $items = new Items;
-        $result = $items
-            ->where('deleted', 0)
-            ->orderBy('itemname', 'ASC')
-            ->skip($limit)
-            ->take($maxitem)
-            ->get();
+        $result = $items->where('deleted', 0);
+        if($request->sort_category != "all"){
+            $result->where('category', htmlspecialchars($request->sort_category));
+        }
+        if($request->sort_supplier != "all"){
+            $result->where('supplierID', $request->sort_supplier);
+        }
+        if($request->sort_general != ""){
+            switch ($request->sort_general) {
+                case "Z-A":
+                    $result->orderBy('itemname', 'DESC');
+                    break;
+                case 'Q-D':
+                    $result->orderBy('quantity', 'DESC');
+                    break;
+                case 'Q-A':
+                    $result->orderBy('quantity', 'ASC');
+                    break;
+                default:
+                    $result->orderBy('itemname', 'ASC');
+                    break;
+            }
+        }else{
+            $result->orderBy('itemname', 'ASC');
+        }
+        $result->skip($limit);
+        $result->take($maxitem);
+        $result = $result->get();
         foreach ($result as $item_data) {
            $item_data->total_costprice = number_format($item_data->costprice * $item_data->quantity,2);
            $item_data->quantity = number_format($item_data->quantity);
@@ -80,12 +102,22 @@ class Items_controller extends Controller
         }
         $data["getQueryLog"] = DB::getQueryLog();
         $data["result"] = $result;
-        $data["count"] = $items
-            ->where('deleted', 0)
-            ->orderBy('category', 'desc')
-            ->count();
-
+        $count = $items->where('deleted', 0);
+        if($request->sort_category != "all"){
+            $count->where('category', htmlspecialchars($request->sort_category));
+        }
+        if($request->sort_supplier != "all"){
+            $count->where('supplierID', $request->sort_supplier);
+        }
+        $data["count"] = $count->count();
+        $data["paging"] = paging($page,$count->count(),$maxitem);
         return $data;
+    }
+
+    public function get_categories($value='')
+    {
+        $items = new Items;
+        return $items->select('category')->where("deleted",0)->distinct()->get();
     }
 
     public function show($itemID)
