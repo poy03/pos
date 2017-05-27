@@ -42,11 +42,15 @@ class Suppliers_controller extends Controller
         $maxitem = $request->maxitem;
         $limit = ($page*$maxitem)-$maxitem;
         $suppliers = new suppliers;
-        $result = $suppliers->where('deleted', 0)
-           ->orderBy('supplier_company', 'ASC')
-           ->skip($limit)
-           ->take($maxitem)
-           ->get();
+        $result = $suppliers->where('deleted', 0);
+        if($request->supplierID){
+            $result->where("supplierID",$request->supplierID);
+        }
+        $result->orderBy('supplier_company', 'ASC');
+        $result->skip($limit);
+        $result->take($maxitem);
+        $result = $result->get();
+        $result_count = $result->count();
         foreach ($result as $supplier_data) {
             $supplier_data->supplier_name = $supplier_data->supplier_name;
             $supplier_data->supplier_company = $supplier_data->supplier_company;
@@ -55,11 +59,20 @@ class Suppliers_controller extends Controller
         }
         $data["getQueryLog"] = DB::getQueryLog();
         $data["result"] = $result;
-        $data["count"] = $suppliers->where('deleted', 0)
-            ->orderBy('supplier_company', 'ASC')
-            ->count();
-
+        $count = $suppliers->where('deleted', 0);
+        if($request->supplierID){
+            $count->where("supplierID",$request->supplierID);
+        }
+        $count->orderBy('supplier_company', 'ASC');
+        $count = ($result_count==0?0:$count->count());
+        $data["paging"] = paging($page,$count,$maxitem);
         return $data;
+    }
+
+    public function get_suppliers()
+    {
+        $suppliers = new Suppliers;
+        return $suppliers->select("supplier_company","supplierID")->where("deleted",0)->get();
     }
 
     public function show($supplierID)

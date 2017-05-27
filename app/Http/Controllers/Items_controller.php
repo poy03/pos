@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Requests;
 use Validator;
 use App\Items;
+use App\Suppliers;
 use App\Items_history;
 
 class Items_controller extends Controller
@@ -64,6 +65,7 @@ class Items_controller extends Controller
         $maxitem = $request->maxitem;
         $limit = ($page*$maxitem)-$maxitem;
         $items = new Items;
+        $suppliers = new Suppliers;
         $result = $items->where('deleted', 0);
         if($request->sort_category != "all"){
             $result->where('category', htmlspecialchars($request->sort_category));
@@ -92,6 +94,7 @@ class Items_controller extends Controller
         $result->skip($limit);
         $result->take($maxitem);
         $result = $result->get();
+        $result_count = $result->count();
         foreach ($result as $item_data) {
            $item_data->total_costprice = number_format($item_data->costprice * $item_data->quantity,2);
            $item_data->quantity = number_format($item_data->quantity);
@@ -99,6 +102,7 @@ class Items_controller extends Controller
            $item_data->srp = number_format($item_data->srp,2);
            $item_data->price_to_distributors = number_format($item_data->price_to_distributors,2);
            $item_data->reorder = number_format($item_data->reorder);
+           $item_data->supplier_company = ($item_data->supplierID==0?"":$suppliers->where("supplierID",$item_data->supplierID)->value("supplier_company"));
         }
         $data["getQueryLog"] = DB::getQueryLog();
         $data["result"] = $result;
@@ -109,8 +113,8 @@ class Items_controller extends Controller
         if($request->sort_supplier != "all"){
             $count->where('supplierID', $request->sort_supplier);
         }
-        $data["count"] = $count->count();
-        $data["paging"] = paging($page,$count->count(),$maxitem);
+        $count = ($result_count==0?0:$count->count());
+        $data["paging"] = paging($page,$count,$maxitem);
         return $data;
     }
 

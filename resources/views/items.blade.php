@@ -15,7 +15,6 @@
     </button>
   </div>
   <form action="items/get_list" method="get" id="item-sort-form">
-  {{ csrf_field() }}
   <div class="form-group">
     <label>Category:</label>
     <select class='form-control' id="category-select" name="sort_category">
@@ -139,11 +138,9 @@
         </div>
 
         <div class='form-group'>
-          <label for="supplierID" class='col-md-2'>SupplierID:</label>
+          <label for="supplierID" class='col-md-2'>Supplier:</label>
           <div class='col-md-10'>
             <select name="supplierID" class="form-control edit-field">
-              <option value="">Select SupplierID</option>
-              <option value="1">1</option>
             </select>
             <p class="help-block" id="edit-supplierID-help-block"></p>
           </div>
@@ -331,23 +328,26 @@ $(document).ready(function() {
 
   show_items();
   show_categories();
+  show_supplier_companies(1);
+  show_supplier_companies(2);
   function show_items(page = 1) {
+    var selector = "#items-table";
     $.ajax({
       type: "GET",
       url: "/items/list",
-      data: $("#item-sort-form").serialize()+"&page="+page+"&maxitem="+1,
+      data: $("#item-sort-form").serialize()+"&page="+page+"&maxitem="+50,
       cache: false,
       dataType: "json",
       beforeSend: function() {
-        $("#items-table tbody").html("");
+        $(selector+" tbody").html("");
       },
       success: function(data) {
         for (var i = 0; i < data.result.length; i++) {
-          $('#items-table tbody').append('\
+          $(selector+' tbody').append('\
             <tr>\
               <td><input type="checkbox" value="'+data.result[i].itemID+'" name="selected[]" class="select"></td>\
               <td>'+data.result[i].category+'</td>\
-              <td style="text-align:center;">'+data.result[i].supplierID+'</td>\
+              <td style="text-align:center;">'+data.result[i].supplier_company+'</td>\
               <td style="text-align:left;">'+data.result[i].itemname+'</td>\
               <td style="text-align:center;">'+data.result[i].item_code+'</td>\
               <td style="text-align:center;">'+data.result[i].unit_of_measure+'</td>\
@@ -361,27 +361,68 @@ $(document).ready(function() {
             </tr>\
             ');
         }
-        $("#items-table tfoot").html(data.paging);
+        $(selector+" tfoot").html(data.paging);
+        $(selector+" tfoot").append('<tr><th></th></tr>');
       }
     });
   }
   function show_categories() {
+    var selector = '#category-select';
     $.ajax({
       type: "GET",
       url: "/items/categories",
       cache: false,
       dataType: "json",
       beforeSend: function() {
-        $("#category-select").html('<option value="all">All</option>');
+        $(selector).html('<option value="all">All</option>');
       },
       success: function(data) {
         console.log(data);
         for (var i = 0; i < data.length; i++) {
-          $('#category-select').append('<option value="'+data[i].category+'">'+data[i].category+'</option>');
+          $(selector).append('<option value="'+data[i].category+'">'+data[i].category+'</option>');
         }
       }
     });
   }
+  function show_supplier_companies(type=1) {
+    if(type==1){
+      var selector = 'select[name="supplierID"]';
+      $.ajax({
+        type: "GET",
+        url: "/suppliers/suppliers",
+        cache: false,
+        dataType: "json",
+        beforeSend: function() {
+          $(selector).html("");
+          $(selector).append('<option value="0">Select Supplier</option>');
+        },
+        success: function(data) {
+          for (var i = 0; i < data.length; i++) {
+            $(selector).append('<option value="'+data[i].supplierID+'">'+data[i].supplier_company+'</option>');
+          }
+        }
+      });
+    }else{
+      var selector = 'select[name="sort_supplier"]';
+      $.ajax({
+        type: "GET",
+        url: "/suppliers/suppliers",
+        cache: false,
+        dataType: "json",
+        beforeSend: function() {
+          $(selector).html("");
+          $(selector).append('<option value="all">All Suppliers</option>');
+        },
+        success: function(data) {
+          for (var i = 0; i < data.length; i++) {
+            $(selector).append('<option value="'+data[i].supplierID+'">'+data[i].supplier_company+'</option>');
+          }
+        }
+      });
+    }
+  }
+
+
 });
 </script>
 @endsection

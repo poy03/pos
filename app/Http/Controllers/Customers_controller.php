@@ -52,9 +52,13 @@ class Customers_controller extends Controller
         $customers = new Customers;
         $result = $customers->where('deleted', 0);
         $result->orderBy('companyname', 'ASC');
+        if($request->customerID){
+            $result->where('customerID', $request->customerID);
+        }
         $result->skip($limit);
         $result->take($maxitem);
         $result = $result->get();
+        $result_count = $result->count();
         foreach ($result as $customer_data) {
             $customer_data->companyname = $customer_data->companyname;
             $customer_data->address = $customer_data->address;
@@ -69,15 +73,18 @@ class Customers_controller extends Controller
         $data["result"] = $result;
         $count = $customers->where('deleted', 0);
         $count->orderBy('companyname', 'ASC');
-        $data["count"] = $count->count();
-        $data["paging"] = paging($page,$count->count(),$maxitem);
+        if($request->customerID){
+            $count->where('customerID', $request->customerID);
+        }
+        $count = ($result_count==0?0:$count->count());
+        $data["paging"] = paging($page,$count,$maxitem);
         return $data;
     }
 
     public function get_companynames()
     {
         $customers = new Customers;
-        return $customers->select("companyname")->where("deleted",0)->distinct()->get();
+        return $customers->select("companyname","customerID")->where("deleted",0)->get();
     }
 
     public function show($customerID)

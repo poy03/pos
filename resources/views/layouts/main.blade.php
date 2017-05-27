@@ -321,7 +321,6 @@
 </div>
 </div>
 
-
 <!--Add Supplier -->
 <div id="add-suppliers-modal" class="modal fade" role="dialog" tabindex="-1">
   <div class="modal-dialog modal-lg">
@@ -374,6 +373,128 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <button type="submit" class="btn btn-primary" form="add-suppliers-form">Save</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!--Add Users -->
+<div id="add-users-modal" class="modal fade" role="dialog" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h4 class="modal-title">Add User</h4>
+    </div>
+      <div class="modal-body">
+        <form action="/users" method="post" class="form-horizontal" id="add-users-form">  
+        {{ csrf_field() }}
+
+          <div class='form-group'>
+            <label for='type' class='col-sm-2'>Previlages:</label>
+              <div class='col-sm-10'>
+              <select class='form-control' name='type' id='type'>
+                <option value='user'>User</option>
+                <option value='admin'>Admin</option>
+              </select>
+            </div>
+          </div>
+          
+          
+          <div class='form-group'>
+            <label for='username' class='col-sm-2'>Username:</label>
+            <div class='col-sm-10'>
+              <input type='text' name='username' placeholder='Username' class='form-control' autocomplete="off">
+              <p class="help-block" id="username-help-block"></p>
+            </div>
+          </div>
+          
+          <div class='form-group'>
+            <label for='password' class='col-sm-2'>Password:</label>
+            <div class='col-sm-10'>
+              <input type='password' name='password' placeholder='Password' class='form-control' autocomplete="off">
+            <p class="help-block" id="password-help-block"></p>
+            </div>
+          </div>
+          
+          <div class='form-group'>
+            <label for='name' class='col-sm-2'>Full Name:</label>
+            <div class='col-sm-10'>
+              <input type='text' name='employee_name' placeholder='Full Name' class='form-control' autocomplete="off">
+            <p class="help-block" id="employee_name-help-block"></p>
+            </div>
+          </div>  
+          
+          <div id='admin'>
+            <span><b>Access to modules:</b></span>
+            <div class='row'>
+            <div class="checkbox col-sm-2">
+                <label><input type='checkbox' name='items' value='1' class='module'>Items</label>
+                <br>
+                &nbsp;&nbsp;<label><input type='checkbox' name='items_add' value='1' class='module'>Add Items</label>
+                <br>
+                &nbsp;&nbsp;<label><input type='checkbox' name='items_modify' value='1' class='module'>Modify Items</label>
+              </div>
+            <div class="checkbox col-sm-2">
+                <label><input type='checkbox' name='customers' value='1' class='module'>Customers</label>
+                <br>
+                &nbsp;&nbsp;<label><input type='checkbox' name='customers_add' value='1' class='module'>Add Customers</label>
+                <br>      
+                &nbsp;&nbsp;<label><input type='checkbox' name='customers_modify' value='1' class='module'>Modify Customers</label>      
+              </div>
+            <div class="checkbox col-sm-2">
+                <label><input type='checkbox' name='sales' value='1' class='module'>Sales</label>
+              </div>
+              <div class="checkbox col-sm-2">
+                  <label><input type='checkbox' name='salesman' value='1' class='module'>Salesman</label>
+                  <br>
+                  &nbsp;&nbsp;<label><input type='checkbox' name='salesman_add' value='1' class='module'>Add Salesman</label>
+                  <br>      
+                  &nbsp;&nbsp;<label><input type='checkbox' name='salesman_modify' value='1' class='module'>Modify Salesman</label>      
+                </div>
+            <div class="checkbox col-sm-2">
+                <label><input type='checkbox' name='suppliers' value='1' class='module'>Suppliers</label>
+                <br>
+                &nbsp;&nbsp;<label><input type='checkbox' name='suppliers_add' value='1' class='module'>Add Suppliers</label>
+                <br>      
+                &nbsp;&nbsp;<label><input type='checkbox' name='suppliers_modify' value='1' class='module'>Modify Suppliers</label>      
+              </div>
+            <div class="checkbox col-sm-2">
+                <label><input type='checkbox' name='users' value='1' class='module'>Users</label>
+                <br>
+                &nbsp;&nbsp;<label><input type='checkbox' name='users_add' value='1' class='module'>Add Users</label>
+                <br>      
+                &nbsp;&nbsp;<label><input type='checkbox' name='users_modify' value='1' class='module'>Modify Users</label>      
+              </div>
+              </div>
+              <hr>
+            <div class='row'>
+            <div class="checkbox col-sm-2">
+                <label> <input type='checkbox' name='reports' value='1' class='module'>Reports</label>
+              </div>
+            <div class="checkbox col-sm-2">
+                <label> <input type='checkbox' name='credits' value='1' class='module'>Accounts Receivable</label>
+              </div>
+            <div class="checkbox col-sm-2">
+                <label><input type='checkbox' name='expenses' value='1' class='module'>Expenses</label>
+              </div>
+            <div class="checkbox col-sm-2">
+              <label><input type='checkbox' name='receiving' value='1' class='module'>Receiving</label>
+            </div> 
+            <div class="checkbox col-sm-2">
+              <label><input type='checkbox' name='accounts_payable' value='1' class='module'>Accounts Payable</label>
+            </div> 
+            </div>
+
+          </div>  
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" form="add-users-form">Save</button>
       </div>
     </div>
 

@@ -13,12 +13,16 @@
       <span class="glyphicon glyphicon-trash"></span> Delete Customers
     </button>
   </div>
-  <div class="form-group">
-     <select class="ui search selection dropdown fluid" id="customer-select">
-       <option value="">Search for Customer Name</option>
-     </select>
-  </div>
-
+  <form action="/customers/list" method="get" id="customer-sort-form">
+    <div class="form-group">
+       <select class="ui search selection dropdown fluid" id="customer-select" name="customerID">
+        <option value="">Search for Customer Name</option>
+       </select>
+       <button class="btn btn-danger btn-block" type="button" style="display: none;" id="btn-clear-selection">
+         Clear Selection
+       </button>
+    </div>
+  </form>
 </div>
 
 <div class="col-sm-10">
@@ -158,7 +162,7 @@ $(document).ready(function() {
       success: function(data) {
         alertify.success(data.companyname + " has been successfuly added.");
         $("#add-customers-form")[0].reset();
-        show_customers();
+        show_customers($(".paging-active a").html());
       },
       error: function(data) {
         console.log(data);
@@ -197,7 +201,7 @@ $(document).ready(function() {
       success: function(data) {
         alertify.success(data.companyname + " has been updated.");
         $("#edit-customers-form")[0].reset();
-        show_customers();
+        show_customers($(".paging-active a").html());
         $("#edit-customers-modal").modal("hide");
       },
       error: function(data) {
@@ -244,14 +248,21 @@ $(document).ready(function() {
       }
     })
   });
-
+  $(document).on("change","#customer-select",function(e) {
+    show_customers();
+    $("#btn-clear-selection").css("display","block");
+  });
+  $("#btn-clear-selection").click(function(e) {
+    $("#customer-select").dropdown("clear");
+    $("#btn-clear-selection").css("display","none");
+  });
   show_customers();
   show_companynames();
   function show_customers(page = 1) {
     $.ajax({
       type: "GET",
       url: "/customers/list",
-      data: "page="+page+"&maxitem="+1,
+      data: $("#customer-sort-form").serialize()+"&page="+page+"&maxitem="+1,
       cache: false,
       dataType: "json",
       beforeSend: function() {
@@ -275,6 +286,7 @@ $(document).ready(function() {
             ');
         }
         $("#customers-table tfoot").html(data.paging);
+        $("#customers-table tfoot").append('<tr><th></th></tr>');
       }
     });
   }
@@ -290,7 +302,7 @@ $(document).ready(function() {
       },
       success: function(data) {
         for (var i = 0; i < data.length; i++) {
-          $("#customer-select").append('<option value="'+data[i].companyname+'">'+data[i].companyname+'</option>');
+          $("#customer-select").append('<option value="'+data[i].customerID+'">'+data[i].companyname+'</option>');
         }
       }
     });

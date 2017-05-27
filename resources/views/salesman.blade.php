@@ -14,9 +14,16 @@
     </button>
   </div>
 
-  <div class="form-group">
-    <input type="text" placeholder="Search for Salesman" class="form-control">
-  </div>
+  <form action="/suppliers/list" method="get" id="salesman-sort-form">
+    <div class="form-group">
+       <select class="ui search selection dropdown fluid" id="salesman-select" name="salesmanID">
+        <option value="">Search for Customer Name</option>
+       </select>
+       <button class="btn btn-danger btn-block" type="button" style="display: none;" id="btn-clear-selection">
+         Clear Selection
+       </button>
+    </div>
+  </form>
   
 </div>
 <div class="col-sm-10">
@@ -33,7 +40,9 @@
     <tbody>
 
     </tbody>
+    <tfoot>
 
+    </tfoot>
     </table>
   </div>
 </div>
@@ -113,7 +122,7 @@ $(document).ready(function() {
       success: function(data) {
         alertify.success(data.salesman_name + " has been successfuly added.");
         $("#add-salesman-form")[0].reset();
-        show_salesman();
+        show_salesman($(".paging-active a").html());
       },
       error: function(data) {
         console.log(data);
@@ -135,7 +144,7 @@ $(document).ready(function() {
     var salesmanID = $('input[name="salesmanID"]').val();
     $.ajax({
       type: "PUT",
-      url: "salesman/"+salesmanID,
+      url: "/salesman/salesman/"+salesmanID,
       data: $("#edit-salesman-form").serialize(),
       cache: false,
       dataType: "json",
@@ -144,9 +153,10 @@ $(document).ready(function() {
         $('button[form="edit-salesman-form"]').prop("disabled",true);
       },
       success: function(data) {
-        alertify.success(data.salesman_name + " has been successfuly added.");
+        alertify.success(data.salesman_name + " has been updated.");
         $("#edit-salesman-form")[0].reset();
-        show_salesman();
+        show_salesman($(".paging-active a").html());
+        $("#edit-salesman-modal").modal("hide");
       },
       error: function(data) {
         console.log(data);
@@ -163,38 +173,21 @@ $(document).ready(function() {
     });
   });
 
-
-  show_salesman();
-  function show_salesman(page = 1) {
-    $.ajax({
-      type: "GET",
-      url: "/salesman/list",
-      data: "page="+page+"&maxitem="+50,
-      cache: false,
-      dataType: "json",
-      beforeSend: function() {
-        $("#salesman-table tbody").html("");
-      },
-      success: function(data) {
-        for (var i = 0; i < data.result.length; i++) {
-          $('#salesman-table tbody').append('\
-            <tr>\
-              <td><input type="checkbox" value="'+data.result[i].salesmanID+'" name="selected[]" class="select"></td>\
-              <td>'+data.result[i].salesman_name+'</td>\
-              <td>'+data.result[i].salesman_contact_number+'</td>\
-              <td>'+data.result[i].salesman_address+'</td>\
-              <td><a href="#" id="'+data.result[i].salesmanID+'" class="edit">Edit</a></td>\
-            </tr>\
-            ');
-        }
-      }
-    });
-  }
-
+  $(document).on("click",".paging",function(e) {
+    show_salesman(e.target.id);
+  });
+  $(document).on("change","#salesman-select",function(e) {
+    show_salesman(e.target.id);
+    $("#btn-clear-selection").css("display","block");
+  });
+  $("#btn-clear-selection").click(function(e) {
+    $("#salesman-select").dropdown("clear");
+    $("#btn-clear-selection").css("display","none");
+  });
   $(document).on("click",".edit",function(e) {
     $.ajax({
       type: "GET",
-      url: "/salesman/"+e.target.id,
+      url: "/salesman/salesman/"+e.target.id,
       cache: false,
       dataType: "json",
       success: function(data) {
@@ -206,6 +199,54 @@ $(document).ready(function() {
       }
     })
   });
+
+  show_salesman();
+  show_names();
+  function show_salesman(page = 1) {
+    var selector = "#salesman-table";
+    $.ajax({
+      type: "GET",
+      url: "/salesman/list",
+      data: $("#salesman-sort-form").serialize()+"&page="+page+"&maxitem="+1,
+      cache: false,
+      dataType: "json",
+      beforeSend: function() {
+        $(selector+" tbody").html("");
+      },
+      success: function(data) {
+        for (var i = 0; i < data.result.length; i++) {
+          $(selector+' tbody').append('\
+            <tr>\
+              <td><input type="checkbox" value="'+data.result[i].salesmanID+'" name="selected[]" class="select"></td>\
+              <td>'+data.result[i].salesman_name+'</td>\
+              <td>'+data.result[i].salesman_contact_number+'</td>\
+              <td>'+data.result[i].salesman_address+'</td>\
+              <td><a href="#" id="'+data.result[i].salesmanID+'" class="edit">Edit</a></td>\
+            </tr>\
+            ');
+        }
+        $(selector+' tfoot').html(data.paging);
+        $(selector+' tfoot').append('<tr><th></th></tr>');
+      }
+    });
+  }
+  function show_names() {
+    $.ajax({
+      type: "GET",
+      url: "/salesman/names",
+      cache: false,
+      dataType: "json",
+      beforeSend: function() {
+        $("#salesman-select").html('');
+        $("#salesman-select").append('<option value="">Search Salesman</option>');
+      },
+      success: function(data){
+        for (var i = 0; i < data.length; i++) {
+          $("#salesman-select").append('<option value="'+data[i].salesmanID+'">'+data[i].salesman_name+'</option>');
+        }
+      }
+    })
+  }
 
 });
 </script>

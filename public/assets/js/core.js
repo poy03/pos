@@ -14,4 +14,7 @@ $(document).ready(function(){
   $(".btn-add-suppliers").click(function(e) {
     $('#add-suppliers-modal').modal('show');
   });
+  $(".btn-add-users").click(function(e) {
+    $('#add-users-modal').modal('show');
+  });
 });

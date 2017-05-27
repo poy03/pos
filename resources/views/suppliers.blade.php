@@ -14,9 +14,17 @@
     <span class="glyphicon glyphicon-trash"></span> Delete Suppliers
   </button>
 </div>
+<form action="/suppliers/list" method="get" id="supplier-sort-form">
 <div class="form-group">
-  <input type="text" placeholder="Search for Supplier" class="form-control">
+   <select class="ui search selection dropdown fluid" id="supplier-select" name="supplierID">
+    <option value="">Search for Supplier</option>
+   </select>
+   <button class="btn btn-danger btn-block" type="button" style="display: none;" id="btn-clear-selection">
+     Clear Selection
+   </button>
 </div>
+</form>
+
 </div>
 
 <div class="col-sm-10">
@@ -34,6 +42,9 @@
     <tbody>
 
     </tbody>
+    <tfoot>
+
+    </tfoot>
 
     </table>
   </div>
@@ -120,7 +131,7 @@ $(document).ready(function() {
       success: function(data) {
         alertify.success(data.supplier_name + " has been successfuly added.");
         $("#add-suppliers-form")[0].reset();
-        show_suppliers();
+        show_suppliers($(".paging-active a").html());
       },
       error: function(data) {
         console.log(data);
@@ -137,14 +148,12 @@ $(document).ready(function() {
       }
     });
   });
-
-
   $("#edit-suppliers-form").submit(function(e) {
     e.preventDefault();
     var supplierID = $('input[name="supplierID"]').val();
     $.ajax({
       type: "PUT",
-      url: "suppliers/"+supplierID,
+      url: "/suppliers/supplier/"+supplierID,
       data: $("#edit-suppliers-form").serialize(),
       cache: false,
       dataType: "json",
@@ -153,9 +162,9 @@ $(document).ready(function() {
         $('button[form="edit-suppliers-form"]').prop("disabled",true);
       },
       success: function(data) {
-        alertify.success(data.companyname + " has been updated.");
+        alertify.success(data.supplier_name + " has been updated.");
         $("#edit-suppliers-form")[0].reset();
-        show_suppliers();
+        show_suppliers($(".paging-active a").html());
         $("#edit-suppliers-modal").modal("hide");
       },
       error: function(data) {
@@ -173,13 +182,41 @@ $(document).ready(function() {
       }
     });
   });
-
+  $(document).on("click",".edit",function(e) {
+    $.ajax({
+      type: "GET",
+      url: "/suppliers/supplier/"+e.target.id,
+      cache: false,
+      dataType: "json",
+      success: function(data) {
+        $('input[name="supplierID"]').val(data.supplierID);
+        $('input[name="supplier_name"].edit-field').val(data.supplier_name);
+        $('input[name="supplier_company"].edit-field').val(data.supplier_company);
+        $('input[name="supplier_number"].edit-field').val(data.supplier_number);
+        $('input[name="supplier_address"].edit-field').val(data.supplier_address);
+        $('input[name="contactperson"].edit-field').val(data.contactperson);
+        $("#edit-suppliers-modal").modal("show");
+      }
+    })
+  });
+  $(document).on("click",".paging",function(e) {
+    show_suppliers(e.target.id);
+  });
+  $(document).on("change","#supplier-select",function(e) {
+    show_suppliers();
+    $("#btn-clear-selection").css("display","block");
+  });
+  $("#btn-clear-selection").click(function(e) {
+    $("#supplier-select").dropdown("clear");
+    $("#btn-clear-selection").css("display","none");
+  });
   show_suppliers();
+  show_supplier_companies();
   function show_suppliers(page = 1) {
     $.ajax({
       type: "GET",
       url: "/suppliers/list",
-      data: "page="+page+"&maxitem="+50,
+      data: $("#supplier-sort-form").serialize()+"&page="+page+"&maxitem="+1,
       cache: false,
       dataType: "json",
       beforeSend: function() {
@@ -198,27 +235,28 @@ $(document).ready(function() {
             </tr>\
             ');
         }
+        $("#suppliers-table tfoot").html(data.paging);
+        $("#suppliers-table tfoot").append('<tr><th></th></tr>');
       }
     });
   }
-
-  $(document).on("click",".edit",function(e) {
+  function show_supplier_companies() {
     $.ajax({
       type: "GET",
-      url: "/suppliers/"+e.target.id,
+      url: "/suppliers/suppliers",
       cache: false,
       dataType: "json",
+      beforeSend: function() {
+        $("#supplier-select").html("");
+        $("#supplier-select").append('<option value="">Search for Supplier</option>');
+      },
       success: function(data) {
-        $('input[name="supplierID"]').val(data.supplierID);
-        $('input[name="supplier_name"].edit-field').val(data.supplier_name);
-        $('input[name="supplier_company"].edit-field').val(data.supplier_company);
-        $('input[name="supplier_number"].edit-field').val(data.supplier_number);
-        $('input[name="supplier_address"].edit-field').val(data.supplier_address);
-        $('input[name="contactperson"].edit-field').val(data.contactperson);
-        $("#edit-suppliers-modal").modal("show");
+        for (var i = 0; i < data.length; i++) {
+          $("#supplier-select").append('<option value="'+data[i].supplierID+'">'+data[i].supplier_company+'</option>');
+        }
       }
-    })
-  });
+    });
+  }
 });
 </script>
 @endsection

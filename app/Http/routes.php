@@ -34,6 +34,7 @@ Route::get('salesman/list','Salesman_controller@get_list');
 Route::get('salesman/salesman/{id}','Salesman_controller@show');
 Route::put('salesman/salesman/{id}','Salesman_controller@update');
 Route::post('salesman','Salesman_controller@store');
+Route::get('salesman/names','Salesman_controller@get_names');
 
 
 Route::get('suppliers','Suppliers_controller@index');
@@ -41,9 +42,15 @@ Route::get('suppliers/list','Suppliers_controller@get_list');
 Route::get('suppliers/supplier/{id}','Suppliers_controller@show');
 Route::put('suppliers/supplier/{id}','Suppliers_controller@update');
 Route::post('suppliers','Suppliers_controller@store');
+Route::get('suppliers/suppliers','Suppliers_controller@get_suppliers');
 
 
 Route::get('users','Users_controller@index');
+Route::get('users/list','Users_controller@get_list');
+Route::get('users/user/{id}','Users_controller@show');
+Route::put('users/user/{id}','Users_controller@update');
+Route::post('users','Users_controller@store');
+
 Route::get('reports','Reports_controller@index');
 Route::get('receivables/{tab}','Ar_controller@index');
 Route::get('receivables','Ar_controller@index');
