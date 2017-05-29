@@ -23,10 +23,11 @@
 
     <div class="row">
       <div class="col-sm-12">
-        <table class='table table-hover'>
+        <table class='table table-hover' id="dr-table">
           <thead>
             <tr>
               <th>Item Name</th>
+              <th>Item Code</th>
               <th>Remaining</th>
               <th>Cost Price</th>
               <th>Quantity</th>
@@ -74,16 +75,45 @@ $(document).ready(function(e) {
       source: '/search/items/sales',
       select: function(event, ui){
         $.ajax({
-          type: "GET",
-          url: "/items",
-          data: "id="+ui.item.data,
+          type: "POST",
+          url: "/sales-dr/cart",
+          data: "_token=<?php echo csrf_token(); ?>"+"&id="+ui.item.data,
           cache: false,
+          dataType: "json",
           success: function(data) {
             alert(data);
           }
         });
       }
-  }); 
+  });
+  show_cart();
+  function show_cart() {
+    var selector = "#dr-table";
+    $.ajax({
+      url: "/sales/drcart",
+      cache: false,
+      dataType: "json",
+      beforeSend: function() {
+        $(selector+" tbody").html("");
+      },
+      success: function(data) {
+        for (var i in data.items) {
+          if (data.items.hasOwnProperty(i)) {
+            console.log(i + " -> " + data.items[i]);
+            $(selector+" tbody").append('<tr>\
+              <td>'+data.items[i].itemname+'</td>\
+              <td>'+data.items[i].item_code+'</td>\
+              <td>'+data.items[i].remaining_quantity+'</td>\
+              <td><input type="number" class="costprice" id="'+i+'" value="'+data.items[i].costprice+'"></td>\
+              <td><input type="number" class="quantity" id="'+i+'" value="'+data.items[i].quantity+'"></td>\
+              <td><input type="number" class="price" id="'+i+'" value="'+data.items[i].price+'"></td>\
+              <td>'+data.items[i].line_total+'</td>\
+              </tr>');
+          }
+        }
+      }
+    });
+  }
 });
 </script>
 @endsection
