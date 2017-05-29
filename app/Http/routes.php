@@ -56,3 +56,9 @@ Route::get('receivables/{tab}','Ar_controller@index');
 Route::get('receivables','Ar_controller@index');
 Route::get('payables','Ap_controller@index');
 Route::get('expenses','Expenses_controller@index');
+
+Route::get('sales','Sales_controller@index');
+Route::post('sales-dr/cart/{}','Sales_controller@drcart_add');
+
+
+Route::get('search/items/{arg}','Search_controller@items');

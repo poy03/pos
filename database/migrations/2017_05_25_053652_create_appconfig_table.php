@@ -13,7 +13,7 @@ class CreateAppconfigTable extends Migration
     public function up()
     {
         Schema::create('app_config', function (Blueprint $table) {
-            $table->increments('supplierID');
+            $table->increments('id');
             $table->string('app_name', 100);
             $table->string('type_payment', 100);
             $table->string('address', 100);

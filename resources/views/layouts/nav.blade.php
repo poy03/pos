@@ -1,4 +1,0 @@
-asdkjasdjkasdjkajskdasdjkasd
-
-@yield('test')
-
