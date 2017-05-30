@@ -58,9 +58,13 @@ Route::get('payables','Ap_controller@index');
 Route::get('expenses','Expenses_controller@index');
 
 Route::get('sales','Sales_controller@index');
-Route::get('sales/drcart','Sales_controller@drcart');
+Route::get('sales/drcart_t','Sales_controller@drcart_t');
 Route::get('sales/drcart_d','Sales_controller@drcart_d');
-Route::post('sales-dr/cart','Sales_controller@drcart_add');
+Route::get('sales/drcart','Sales_controller@drcart');
+Route::put('sales/drcart','Sales_controller@drcart_update');
+Route::post('sales/drcart','Sales_controller@drcart_store');
+Route::delete('sales/drcart','Sales_controller@drcart_destroy');
 
 
 Route::get('search/items/{arg}','Search_controller@items');
+Route::get('search/customers/{arg}','Search_controller@customers');
