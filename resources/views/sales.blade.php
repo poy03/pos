@@ -15,7 +15,7 @@
       <div class='col-sm-6'>
         <label>Add Item:</label>
         <div class = "form-group">
-           <input type = "text" class = "form-control" name='itemname' id='itemsearch_cat' autocomplete='off' placeholder='Type for Category'>
+           <input type = "text" class = "form-control" name='itemname' id='item-add-cart-cat' autocomplete='off' placeholder='Type for Category'>
         </div>    
       </div>
     </div>
@@ -66,7 +66,7 @@
         <button class="btn btn-danger" type="button" id="customer-cart-remove-btn" data-balloon="Remove Customer" data-balloon-pos="up">&times;</button>
       </span>
       @else
-      <input tabindex="-1" type="text" class="form-control" id="customer-add-cart" name="Customer" placeholder="Type for Customer Name" value="" autocomplete="off">
+      <input tabindex="-1" type="text" class="form-control" id="customer-add-cart" name="Customer" placeholder="Type for Customer Name" autocomplete="off">
       <span class="input-group-btn" id="customer-cart-btn">
         <button class="btn btn-success btn-add-customers" type="button">Add</button>
       </span>
@@ -75,30 +75,35 @@
 
     <label>Salesman:</label>
     <div class="input-group">
-      <input type='text' id='salesman-add-cart' class='form-control' placeholder='Type for Salesman Name'>
-      <span class="input-group-btn">
-        <button class="btn btn-success" type="button">Add</button>
+      @if($has_salesman)
+      <input type='text' id='salesman-add-cart' class='form-control' placeholder='Type for Salesman Name' value="{{$salesman_data['salesman_name']}}" disabled>
+      <span class="input-group-btn" id="salesman-cart-btn">
+        <button class="btn btn-danger" type="button" id="salesman-cart-remove-btn" data-balloon="Remove Salesman" data-balloon-pos="up">&times;</button>
       </span>
+      @else
+      <input type='text' id='salesman-add-cart' class='form-control' placeholder='Type for Salesman Name'>
+      <span class="input-group-btn" id="salesman-cart-btn">
+        <button class="btn btn-success btn-add-salesman" type="button">Add</button>
+      </span>
+      @endif
     </div>
 
     <div class="form-group">
       <label>Type of Price:</label>
       <select id='type_price' name="type_price" class='form-control'>
-        <option value='srp' selected='selected' >Suggested Retail Price</option>
-        <option value='std_price_to_trade_terms'>STD Price to Trade (Terms)</option>
-        <option value='std_price_to_trade_cod'>STD Price to Trade (COD)</option>
-        <option value='price_to_distributors'>Price to Distributors</option>
+        <option value='srp' {{ ($type_price=='srp' ? 'selected="selected"' : false) }}>Suggested Retail Price</option>
+        <option value='price_to_distributors' {{ ($type_price=='price_to_distributors' ? 'selected="selected"' : false) }}>Dealers Price</option>
       </select>
     </div>
 
     
     <div class="form-group">
       <label>Terms:</label>
-      <input type='number' min='0' name='terms' class='form-control' id='terms' placeholder='Number of Days' value='0'>
+      <input type='number' min='0' name='term' class='form-control' id='term' placeholder='Number of Days' value='{{$term}}'>
     </div>
     <div class="form-group">
       <label>Comments:</label>
-      <textarea name='comments' class='form-control'></textarea>
+      <textarea name='comments' id='comments' class='form-control'>{{$comments}}</textarea>
     </div>
     <div class="form-group">
       <label>Sales Register:</label>
@@ -116,18 +121,12 @@
     </div>
     <div class="form-group">
       <label>Utilities:</label>
-      <button class='btn btn-primary btn-block' href='sales'>
-        <span class='glyphicon glyphicon-refresh'></span> Refresh Page
-      </button>
-      <button class='btn btn-info btn-block' id='reset'>
+      <button class='btn btn-info btn-block' id='reset_price'>
         <span class='glyphicon glyphicon-refresh'></span> Reset All Prices
       </button>
-      <button class='btn btn-info btn-block' id='reset_cost'>
+      <button class='btn btn-info btn-block' id='reset_costprice'>
         <span class='glyphicon glyphicon-refresh'></span> Reset All Cost Price
       </button>
-      <button class='btn btn-info btn-block' name='delete' href='sales-re'>
-        <span class='glyphicon glyphicon-shopping-cart'></span> Sales Search
-      </button>  
     </div>
   </div>
 </div>
@@ -142,7 +141,7 @@
 <script type="text/javascript">
 $(document).ready(function(e) {
   $("#item-add-cart").autocomplete({
-      source: '/search/items/sales',
+      source: '/search/items/sales?search_by=itemname',
       select: function(event, ui){
         $.ajax({
           type: "POST",
@@ -153,6 +152,23 @@ $(document).ready(function(e) {
           complete: function() {
             show_cart();
             $("#item-add-cart").val("");
+          }
+        });
+      }
+  });
+
+  $("#item-add-cart-cat").autocomplete({
+      source: '/search/items/sales?search_by=category',
+      select: function(event, ui){
+        $.ajax({
+          type: "POST",
+          url: "/sales/drcart",
+          data: "_token=<?php echo csrf_token(); ?>"+"&id="+ui.item.data+"&type=items",
+          cache: false,
+          dataType: "json",
+          complete: function() {
+            show_cart();
+            $("#item-add-cart-cat").val("");
           }
         });
       }
@@ -170,6 +186,27 @@ $(document).ready(function(e) {
           success: function(data) {
             $("#customer-add-cart").prop("disabled",true);
             $("#customer-cart-btn").html('<button class="btn btn-danger" type="button" id="customer-cart-remove-btn" data-balloon="Remove Customer" data-balloon-pos="up">&times;</button>');
+            $("#term").val(data.term);
+          }
+        });
+      }
+  });
+
+  $("#salesman-add-cart").autocomplete({
+      source: '/search/salesman/sales',
+      select: function(event, ui){
+        $.ajax({
+          type: "POST",
+          url: "/sales/drcart",
+          data: "_token=<?php echo csrf_token(); ?>"+"&id="+ui.item.data+"&type=salesman",
+          cache: false,
+          dataType: "json",
+          success: function(data) {
+            $("#salesman-add-cart").prop("disabled",true);
+            $("#salesman-cart-btn").html('<button class="btn btn-danger" type="button" id="salesman-cart-remove-btn" data-balloon="Remove Salesman" data-balloon-pos="up">&times;</button>');
+          },
+          error: function(data) {
+            console.log(data.responseText);
           }
         });
       }
@@ -188,6 +225,72 @@ $(document).ready(function(e) {
       }
     });
   });
+
+  $(document).on("click","#salesman-cart-remove-btn",function(e) {
+    $.ajax({
+      type: "DELETE",
+      url: "/sales/drcart",
+      data: "_token=<?php echo csrf_token(); ?>"+"&type=salesman",
+      cache: false,
+      success: function(data) {
+        $("#salesman-add-cart").prop("disabled",false);
+        $("#salesman-add-cart").val("");
+        $("#salesman-cart-btn").html('<button class="btn btn-success btn-add-salesman" type="button">Add</button>');
+      }
+    });
+  });
+
+  $(document).on("change","#type_price",function(e) {
+    $.ajax({
+      type: "PUT",
+      url: "/sales/drcart",
+      data: "_token=<?php echo csrf_token(); ?>"+"&type_price="+e.target.value,
+      cache: false,
+      beforeSend: function() {
+
+      },
+      success: function(data) {
+        show_cart();
+      },
+      complete: function() {
+
+      }
+    });
+  })
+
+  $(document).on("change","#term",function(e) {
+    $.ajax({
+      type: "PUT",
+      url: "/sales/drcart",
+      data: "_token=<?php echo csrf_token(); ?>"+"&term="+e.target.value,
+      cache: false,
+      beforeSend: function() {
+
+      },
+      success: function(data) {
+      },
+      complete: function() {
+
+      }
+    });
+  })
+
+  $(document).on("change","#comments",function(e) {
+    $.ajax({
+      type: "PUT",
+      url: "/sales/drcart",
+      data: "_token=<?php echo csrf_token(); ?>"+"&comments="+e.target.value,
+      cache: false,
+      beforeSend: function() {
+
+      },
+      success: function(data) {
+      },
+      complete: function() {
+
+      }
+    });
+  })
 
   $(document).on("change keyup",".price",function(e) {
     var id = e.target.id;
@@ -274,6 +377,44 @@ $(document).ready(function(e) {
       cache: false,
       success: function(data) {
         show_cart();
+      }
+    });
+  });
+
+  $(document).on("click","#reset_price",function(e) {
+    var id = e.target.id;
+    $.ajax({
+      type: "PUT",
+      url: "/sales/drcart",
+      data: "_token=<?php echo csrf_token(); ?>"+"&reset=price",
+      cache: false,
+      beforeSend: function() {
+
+      },
+      success: function(data) {
+        show_cart();
+      },
+      complete: function() {
+
+      }
+    });
+  });
+
+  $(document).on("click","#reset_costprice",function(e) {
+    var id = e.target.id;
+    $.ajax({
+      type: "PUT",
+      url: "/sales/drcart",
+      data: "_token=<?php echo csrf_token(); ?>"+"&reset=costprice",
+      cache: false,
+      beforeSend: function() {
+
+      },
+      success: function(data) {
+        show_cart();
+      },
+      complete: function() {
+
       }
     });
   });
