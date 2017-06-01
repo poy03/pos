@@ -19,10 +19,10 @@ class CreateAppconfigTable extends Migration
             $table->string('address', 100);
             $table->string('contact_number', 100);
             $table->string('app_company_name', 100);
-            $table->float('maximum_items_displayed');
             $table->text('logo');
             $table->integer('accounting_period');
-            $table->integer('statementID');
+            $table->integer('statement_id');
+            $table->string('version', 20);
         });
     }
 

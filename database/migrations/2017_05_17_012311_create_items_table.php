@@ -12,23 +12,19 @@ class CreateItemsTable extends Migration
      */
     public function up()
     {
-        Schema::create('tbl_items', function (Blueprint $table) {
-            $table->increments('itemID');
+        Schema::create('item', function (Blueprint $table) {
+            $table->increments('id');
             $table->string('itemname', 100);
-            $table->string('category', 50);
-            $table->double('sub_costprice');
-            $table->double('srp');
-            $table->integer('supplierID');
-            $table->float('quantity');
-            $table->double('costprice');
-            $table->integer('deleted');
-            $table->integer('reorder');
-            $table->string('item_code', 200);
-            $table->double('std_price_to_trade_terms');
-            $table->double('std_price_to_trade_cod');
-            $table->double('price_to_distributors');
+            $table->string('category', 100);
+            $table->string('item_code', 100);
             $table->string('unit_of_measure', 100);
-            // $table->timestamps();
+            $table->double('costprice');
+            $table->double('srp');
+            $table->double('dealers');
+            $table->float('quantity');
+            $table->integer('reorder_level');
+            $table->integer('supplier_id');
+            $table->integer('deleted');
         });
     }
 

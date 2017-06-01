@@ -13,8 +13,8 @@ class CreateSalesmanTable extends Migration
     public function up()
     {
         //
-        Schema::create('tbl_salesman', function (Blueprint $table) {
-            $table->increments('salesmanID');
+        Schema::create('salesman', function (Blueprint $table) {
+            $table->increments('id');
             $table->string('salesman_name', 150);
             $table->string('salesman_address', 150);
             $table->string('salesman_contact_number', 150);

@@ -12,14 +12,15 @@ class CreateItemsHistoryTable extends Migration
      */
     public function up()
     {
-        Schema::create('tbl_items_history', function (Blueprint $table) {
+        Schema::create('item_history', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('itemID');
-            $table->float('quantity');
+            $table->integer('item_id');
+            $table->integer('quantity');
             $table->string('type', 100);
             $table->text('remarks');
-            $table->integer('ref_id');
-            $table->integer('date_time');
+            $table->string('ref_id',100);
+            $table->integer('date_entry');
+            $table->integer('datetime_entry');
             $table->integer('accountID');
             // $table->timestamps();
         });
