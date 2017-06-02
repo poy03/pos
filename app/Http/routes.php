@@ -68,4 +68,3 @@ Route::delete('sales/drcart','Sales_controller@drcart_destroy');
 
 Route::get('search/items/{arg}','Search_controller@items');
 Route::get('search/customers/{arg}','Search_controller@customers');
-Route::get('search/salesman/{arg}','Search_controller@salesman');
