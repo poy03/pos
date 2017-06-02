@@ -8,15 +8,24 @@ use Validator;
 use App\Http\Requests;
 use App\Items;
 use App\Customers;
+use App\Salesman;
 
 class Sales_controller extends Controller
 {
     public function index(Request $request)
     {
       $data["has_customer"] = FALSE;
+      $data["has_salesman"] = FALSE;
+      $data["type_price"] = ($request->session()->has('sales_dr.type_price')?$request->session()->get('sales_dr.type_price'):'srp');
+      $data["term"] = ($request->session()->has('sales_dr.term')?$request->session()->get('sales_dr.term'):'');
+      $data["comments"] = ($request->session()->has('sales_dr.comments')?$request->session()->get('sales_dr.comments'):'');
       if($request->session()->has('sales_dr.customer_data')&&$request->session()->get('sales_dr.customer_data')!=array()){
         $data["has_customer"] = TRUE;
         $data["customer_data"] = $request->session()->get('sales_dr.customer_data');
+      }
+      if($request->session()->has('sales_dr.salesman_data')&&$request->session()->get('sales_dr.salesman_data')!=array()){
+        $data["has_salesman"] = TRUE;
+        $data["salesman_data"] = $request->session()->get('sales_dr.salesman_data');
       }
       return view('sales',$data);
     }
@@ -32,7 +41,6 @@ class Sales_controller extends Controller
             'price' => 0,
             'costprice' => 0,
           ];
-          $data["type_price"] = 'srp';
           $request->session()->put('sales_dr', $data);
         }else{
           if ($request->session()->has('sales_dr.items')&&$request->session()->get('sales_dr.items')!=array()) {
@@ -49,7 +57,8 @@ class Sales_controller extends Controller
               'costprice' => 0,
             ];
           }
-          $data["type_price"] = 'srp';
+          $data["type_price"] = ($request->session()->has('sales_dr.type_price')?$request->session()->get('sales_dr.type_price'):'srp');
+          $data["term"] = ($request->session()->has('sales_dr.term')?$request->session()->get('sales_dr.term'):'');
           $request->session()->put('sales_dr', $data);
         }
       }elseif ($request->type&&$request->type=="customer") {
@@ -63,8 +72,19 @@ class Sales_controller extends Controller
           "customer_name" => $customer_data->companyname,
         ];
         $request->session()->put('sales_dr', $data);
+      }elseif ($request->type&&$request->type=="salesman") {
+        $salesman = new Salesman; 
+        $salesman_data = $salesman->where("salesmanID",$request->id)->first();
+        if($request->session()->has('sales_dr')&&$request->session()->get('sales_dr')!=array()){
+          $data = $request->session()->get('sales_dr');
+        }
+        $data["salesman_data"] = [
+          "salesmanID" => $request->id,
+          "salesman_name" => $salesman_data->salesman_name,
+        ];
+        $request->session()->put('sales_dr', $data);
       }
-          return $data;
+      return $data;
     }
 
     public function drcart_update(Request $request)
@@ -80,6 +100,29 @@ class Sales_controller extends Controller
       }elseif ($request->costprice) {
         $data["items"][$request->id]["costprice"] = abs($request->costprice);
         $request->session()->put('sales_dr', $data);
+      }elseif ($request->type_price) {
+        $data["type_price"] = $request->type_price;
+        $request->session()->put('sales_dr', $data);
+      }elseif ($request->term) {
+        $data["term"] = $request->term;
+        $request->session()->put('sales_dr', $data);
+      }elseif ($request->comments) {
+        $data["comments"] = $request->comments;
+        $request->session()->put('sales_dr', $data);
+      }elseif ($request->type=="reset_price") {
+        if($request->session()->get('sales_dr.items')!=array()){
+          foreach ($request->session()->get('sales_dr.items') as $key => $value) {
+            $data["items"][$key]["price"] = 0;
+          }
+          $request->session()->put('sales_dr', $data);
+        }
+      }elseif ($request->type=="reset_costprice") {
+        if($request->session()->get('sales_dr.items')!=array()){
+          foreach ($request->session()->get('sales_dr.items') as $key => $value) {
+            $data["items"][$key]["costprice"] = 0;
+          }
+          $request->session()->put('sales_dr', $data);
+        }
       }
         
     }    
@@ -144,15 +187,39 @@ class Sales_controller extends Controller
         if($request->id){
           $request->session()->forget('sales_dr.items.'.$request->id);
         }else{
-          $request->session()->forget('sales_dr');
+          $request->session()->forget('sales_dr.items');
         }
       }elseif ($request->type&&$request->type=="customers") {
         $request->session()->forget('sales_dr.customer_data');
+      }elseif ($request->type&&$request->type=="salesman") {
+        $request->session()->forget('sales_dr.salesmanr_data');
+      }elseif ($request->type&&$request->type=="cart") {
+        $request->session()->forget('sales_dr');
       }
     }
 
-    public function drcart_d(Request $request)
+    public function dr_create(Request $request)
     {
-      $request->session()->forget('sales_dr');
+      $items = new Items;
+      $cart_data = $request->session()->get("sales_dr.items");
+      foreach ($cart_data as $itemID => $item_cart) {
+        $valid_items = TRUE;
+        $item_data = $items->where("itemID",$itemID)->where("deleted",0)->first();
+        if($item_data==NULL){
+          $valid_items = FALSE;
+          break;
+        }
+        if($item_data->quantity < $item_cart["quantity"]){
+            $valid_items = FALSE;
+            break;
+        }
+        if(!$valid_items){
+          break;
+        }
+      }
+      if(!$valid_items){
+        return response('Hello World', 422);
+      }
+      
     }
 }

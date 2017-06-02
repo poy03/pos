@@ -12,15 +12,16 @@ class CreateCustomersTable extends Migration
      */
     public function up()
     {
-        Schema::create('customer', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name', 100);
-            $table->string('address', 100);
-            $table->string('email_address', 100);
-            $table->string('contact_number', 100);
-            $table->string('contact_person', 100);
+        //
+        Schema::create('tbl_customer', function (Blueprint $table) {
+            $table->increments('customerID');
+            $table->string('companyname', 100);
+            $table->string('address', 50);
+            $table->string('email', 50);
+            $table->string('phone', 50);
+            $table->string('contactperson', 50);
             $table->integer('deleted');
-            $table->string('tin_id', 100);
+            $table->string('tin_id', 200);
             $table->double('credit_limit');
             $table->integer('term');
             // $table->timestamps();
@@ -34,6 +35,7 @@ class CreateCustomersTable extends Migration
      */
     public function down()
     {
+        //
         Schema::dropIfExists('tbl_customer');
     }
 }

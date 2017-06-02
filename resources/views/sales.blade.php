@@ -52,7 +52,10 @@
 
 
   <div class='col-sm-2'>
-
+    <form action="/sales" method="post" id="sales_dr-form">
+    {{ csrf_field() }}
+      
+    </form>
     <div class="form-group">
       <label>Delivery Receipt</label>
       <input type='number' class='form-control' name='dr_number' required>
@@ -75,39 +78,47 @@
 
     <label>Salesman:</label>
     <div class="input-group">
-      <input type='text' id='salesman-add-cart' class='form-control' placeholder='Type for Salesman Name'>
-      <span class="input-group-btn">
-        <button class="btn btn-success" type="button">Add</button>
+      @if($has_salesman)
+      <input type='text' id='salesman-add-cart' class='form-control' placeholder='Type for Salesman Name' value="{{$salesman_data['salesman_name']}}" disabled>
+      <span class="input-group-btn" id="salesman-cart-btn">
+        <button class="btn btn-danger" type="button" id="salesman-cart-remove-btn" data-balloon="Remove Customer" data-balloon-pos="up">&times;</button>
       </span>
+      @else
+      <input type='text' id='salesman-add-cart' class='form-control' placeholder='Type for Salesman Name'>
+      <span class="input-group-btn" id="salesman-cart-btn">
+        <button class="btn btn-success btn-add-salesman" type="button">Add</button>
+      </span>
+      @endif
     </div>
 
     <div class="form-group">
       <label>Type of Price:</label>
       <select id='type_price' name="type_price" class='form-control'>
-        <option value='srp' selected='selected' >Suggested Retail Price</option>
-        <option value='std_price_to_trade_terms'>STD Price to Trade (Terms)</option>
-        <option value='std_price_to_trade_cod'>STD Price to Trade (COD)</option>
-        <option value='price_to_distributors'>Price to Distributors</option>
+        <option value='srp' {{ ($type_price=="srp"?'selected="selected"':false) }}>Suggested Retail Price</option>
+        <option value='price_to_distributors' {{ ($type_price=="price_to_distributors"?'selected="selected"':false) }}>Price to Distributors</option>
       </select>
     </div>
 
     
     <div class="form-group">
       <label>Terms:</label>
-      <input type='number' min='0' name='terms' class='form-control' id='terms' placeholder='Number of Days' value='0'>
+      <input type='number' min='0' name='term' value="{{$term}}" class='form-control' id='term' placeholder='Number of Days' value='0'>
     </div>
     <div class="form-group">
       <label>Comments:</label>
-      <textarea name='comments' class='form-control'></textarea>
+      <textarea name='comments' class='form-control' id="comments">{{$comments}}</textarea>
     </div>
     <div class="form-group">
       <label>Sales Register:</label>
-      <button class='btn btn-primary btn-block' name='save'  id="sales-submit">
+      <button type="submit" class='btn btn-primary btn-block' form="sales_dr-form">
         <span class='glyphicon glyphicon-floppy-disk'></span> Save & Continue
       </button>
-      <a class='btn btn-danger btn-block' name='delete' id='delall'>
-        <span class='glyphicon glyphicon-trash'></span> Cancel Sale
-      </a>
+      <button class='btn btn-danger btn-block' id='clear_items'>
+        <span class='glyphicon glyphicon-trash'></span> Clear All Items
+      </button>
+      <button class='btn btn-danger btn-block' id='clear_cart'>
+        <span class='glyphicon glyphicon-trash'></span> Clear Sales Cart
+      </button>
     </div>
 
     <div class="form-group">
@@ -116,18 +127,12 @@
     </div>
     <div class="form-group">
       <label>Utilities:</label>
-      <button class='btn btn-primary btn-block' href='sales'>
-        <span class='glyphicon glyphicon-refresh'></span> Refresh Page
-      </button>
-      <button class='btn btn-info btn-block' id='reset'>
+      <button class='btn btn-info btn-block' id='reset_price'>
         <span class='glyphicon glyphicon-refresh'></span> Reset All Prices
       </button>
-      <button class='btn btn-info btn-block' id='reset_cost'>
+      <button class='btn btn-info btn-block' id='reset_costprice'>
         <span class='glyphicon glyphicon-refresh'></span> Reset All Cost Price
       </button>
-      <button class='btn btn-info btn-block' name='delete' href='sales-re'>
-        <span class='glyphicon glyphicon-shopping-cart'></span> Sales Search
-      </button>  
     </div>
   </div>
 </div>
@@ -175,6 +180,23 @@ $(document).ready(function(e) {
       }
   });
 
+  $("#salesman-add-cart").autocomplete({
+      source: '/search/salesman/sales',
+      select: function(event, ui){
+        $.ajax({
+          type: "POST",
+          url: "/sales/drcart",
+          data: "_token=<?php echo csrf_token(); ?>"+"&id="+ui.item.data+"&type=salesman",
+          cache: false,
+          dataType: "json",
+          success: function(data) {
+            $("#salesman-add-cart").prop("disabled",true);
+            $("#salesman-cart-btn").html('<button class="btn btn-danger" type="button" id="salesman-cart-remove-btn" data-balloon="Remove Customer" data-balloon-pos="up">&times;</button>');
+          }
+        });
+      }
+  });
+
   $(document).on("click","#customer-cart-remove-btn",function(e) {
     $.ajax({
       type: "DELETE",
@@ -185,6 +207,20 @@ $(document).ready(function(e) {
         $("#customer-add-cart").prop("disabled",false);
         $("#customer-add-cart").val("");
         $("#customer-cart-btn").html('<button class="btn btn-success btn-add-customers" type="button">Add</button>');
+      }
+    });
+  });
+
+  $(document).on("click","#salesman-cart-remove-btn",function(e) {
+    $.ajax({
+      type: "DELETE",
+      url: "/sales/drcart",
+      data: "_token=<?php echo csrf_token(); ?>"+"&type=salesman",
+      cache: false,
+      success: function(data) {
+        $("#salesman-add-cart").prop("disabled",false);
+        $("#salesman-add-cart").val("");
+        $("#salesman-cart-btn").html('<button class="btn btn-success btn-add-customers" type="button">Add</button>');
       }
     });
   });
@@ -264,8 +300,119 @@ $(document).ready(function(e) {
     });
   });
 
+  $(document).on("change","#type_price",function(e) {
+    $.ajax({
+      type: "PUT",
+      url: "/sales/drcart",
+      data: "_token=<?php echo csrf_token(); ?>"+"&type_price="+e.target.value,
+      cache: false,
+      beforeSend: function() {
 
-  $(document).on("click",".delete",function(e) {
+      },
+      success: function(data) {
+        show_cart();
+      },
+      complete: function() {
+       
+      }
+    });
+  });
+
+  $(document).on("keyup change","#term",function(e) {
+    $.ajax({
+      type: "PUT",
+      url: "/sales/drcart",
+      data: "_token=<?php echo csrf_token(); ?>"+"&term="+e.target.value,
+      cache: false
+    });
+  });
+
+  $(document).on("keyup change","#comments",function(e) {
+    $.ajax({
+      type: "PUT",
+      url: "/sales/drcart",
+      data: "_token=<?php echo csrf_token(); ?>"+"&comments="+e.target.value,
+      cache: false
+    });
+  });
+
+  $(document).on("click","#reset_price",function(e) {
+    $.ajax({
+      type: "PUT",
+      url: "/sales/drcart",
+      data: "_token=<?php echo csrf_token(); ?>"+"&type=reset_price",
+      cache: false,
+      success: function() {
+        show_cart();
+      }
+    });
+  }); 
+
+  $(document).on("click","#reset_costprice",function(e) {
+    $.ajax({
+      type: "PUT",
+      url: "/sales/drcart",
+      data: "_token=<?php echo csrf_token(); ?>"+"&type=reset_costprice",
+      cache: false,
+      success: function() {
+        show_cart();
+      }
+    });
+  }); 
+
+  $(document).on("click","#clear_cart",function(e) {
+    alertify.confirm(
+      'Clear All Items',
+      'Are you sure you want to clear all data in the sales cart? This action is irreversible.',
+      function(){
+        $.ajax({
+          type: "DELETE",
+          url: "/sales/drcart",
+          data: "_token=<?php echo csrf_token(); ?>"+"&type=cart",
+          cache: false
+        });
+        var msg = alertify.success('All data in the sales cart are cleared. Reloading the page.');
+        msg.callback = function (isClicked) {
+          if(isClicked){
+            location.reload();
+          }
+          else{  
+            location.reload();
+          }
+        };
+      },
+      function(){
+        alertify.error('Cancel');
+      }
+    );
+  }); 
+
+  $(document).on("click","#clear_items",function(e) {
+
+    alertify.confirm(
+      'Clear All Items',
+      'Are you sure you want to clear all items in the sales cart? This action is irreversible.',
+      function(){
+        $.ajax({
+          type: "DELETE",
+          url: "/sales/drcart",
+          data: "_token=<?php echo csrf_token(); ?>"+"&type=items",
+          cache: false,
+          success: function() {
+            show_cart();
+          }
+        });
+        alertify.success('Items in the sales cart are cleared');
+      },
+      function(){
+        alertify.error('Cancel');
+      }
+    );
+
+  });
+
+
+  $(document).on("click",".delete_cart_item",function(e) {
     var id = e.target.id;
     $.ajax({
       type: "DELETE",
@@ -277,6 +424,28 @@ $(document).ready(function(e) {
       }
     });
   });
+
+  $(document).on("submit","#sales_dr-form",function(e) {
+    // e.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: $("#sales_dr-form").attr("action"),
+      data: $("#sales_dr-form").serialize(),
+      cache: false,
+      beforeSend: function(){
+        $('button[form="sales_dr-form"]').prop("disabled",true);
+      },
+      success: function(data){
+        console.log(data)
+      },
+      error: function(e) {
+        
+      },
+      complete: function() {
+        $('button[form="sales_dr-form"]').prop("disabled",false);
+      }
+    });
+  })
 
   show_cart();
   function show_cart() {
@@ -294,7 +463,7 @@ $(document).ready(function(e) {
           for (var i in data.items) {
             if (data.items.hasOwnProperty(i)) {
               $(selector+" tbody").append('<tr>\
-                <td><a class="delete" id="'+i+'" href="#">&times</a></td>\
+                <td><a class="delete_cart_item" id="'+i+'" href="#">&times</a></td>\
                 <td>'+data.items[i].itemname+'</td>\
                 <td>'+data.items[i].item_code+'</td>\
                 <td>'+data.items[i].remaining_quantity+'</td>\

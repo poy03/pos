@@ -12,15 +12,15 @@ class CreateItemsHistoryTable extends Migration
      */
     public function up()
     {
-        Schema::create('item_history', function (Blueprint $table) {
+        //
+        Schema::create('tbl_items_history', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('item_id');
-            $table->integer('quantity');
+            $table->integer('itemID');
+            $table->float('quantity');
             $table->string('type', 100);
             $table->text('remarks');
-            $table->string('ref_id',100);
-            $table->integer('date_entry');
-            $table->integer('datetime_entry');
+            $table->integer('ref_id');
+            $table->integer('date_time');
             $table->integer('accountID');
             // $table->timestamps();
         });
@@ -33,6 +33,7 @@ class CreateItemsHistoryTable extends Migration
      */
     public function down()
     {
+        //
         Schema::dropIfExists('tbl_items_history');
     }
 }

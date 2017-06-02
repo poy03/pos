@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use DB;
 use App\Items;
 use App\Customers;
+use App\Salesman;
 use App\Http\Requests;
 
 class Search_controller extends Controller
@@ -51,6 +52,26 @@ class Search_controller extends Controller
 
         foreach ($search_results as $result) {
           $data[] = array("label"=>htmlspecialchars_decode($result->companyname),"data"=>$result->customerID);
+        }
+        echo json_encode($data);
+      }
+    }
+
+    public function salesman(Request $request, $arg='')
+    {
+      $salesman = new Salesman;
+      if($arg=="sales"){
+        $q = htmlspecialchars(trim($request->term));
+        $data = array();
+        $search_results = $salesman->select('salesman_name','salesmanID');
+        $search_results->where('salesman_name', 'like', '%'.$q.'%');
+        $search_results->where('deleted',0);
+        $search_results->orderBy('salesman_name','ASC');
+
+        $search_results = $search_results->get();
+
+        foreach ($search_results as $result) {
+          $data[] = array("label"=>htmlspecialchars_decode($result->salesman_name),"data"=>$result->salesmanID);
         }
         echo json_encode($data);
       }
