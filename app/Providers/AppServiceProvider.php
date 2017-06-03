@@ -27,6 +27,24 @@ class AppServiceProvider extends ServiceProvider
             return ($db_data->count() == 1?FALSE:TRUE);
         });
 
+        Validator::extend('quantity_items_sales', function($attribute, $value, $parameters, $validator) {
+
+        });
+
+        Validator::extend('valid_items_sales', function($attribute, $value, $parameters, $validator) {
+            $return = TRUE;
+            foreach ($parameters[0] as $itemID) {
+                $item_data = DB::table("tbl_items");
+                $item_data->where("itemID",$itemID);
+                $item_data->where("deleted",0);
+                if($item_data->count() == 0){
+                    $return = FALSE;
+                    break;
+                }
+            }
+            return $return;
+        });
+
     }
 
     /**

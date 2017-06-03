@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateOrdersTable extends Migration
+class CreateSalesdrTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,14 +12,15 @@ class CreateOrdersTable extends Migration
      */
     public function up()
     {
-        Schema::create('order', function (Blueprint $table) {
+        //
+        Schema::create('tbl_orders', function (Blueprint $table) {
             $table->increments('orderID');
             $table->integer('date_ordered');
-            $table->integer('datetime_ordered');
-            $table->integer('user_id');
-            $table->double('total_sales');
-            $table->string('type_payment', 20);
-            $table->string('customer', 100);
+            $table->integer('time_ordered');
+            $table->integer('accountID');
+            $table->double('total');
+            $table->string('type_payment',100);
+            $table->string('customer',100);
             $table->double('payment');
             $table->double('profits');
             $table->double('loss');
@@ -33,8 +34,8 @@ class CreateOrdersTable extends Migration
             $table->integer('overdue_date_3');
             $table->integer('customerID');
             $table->integer('approved');
-            $table->integer('editID');
-            $table->integer('remarks');
+            $table->text('editID');
+            $table->text('remarks');
             $table->integer('terms');
             $table->integer('ts_orderID');
             $table->integer('salesmanID');
@@ -42,14 +43,13 @@ class CreateOrdersTable extends Migration
             $table->integer('received');
             $table->text('delete_comment');
             $table->integer('deleted_by');
-            $table->text('delete_comment');
             $table->text('date_delivered');
             $table->text('pdc_bank');
             $table->text('pdc_check_number');
             $table->text('pdc_date');
-            $table->text('pdc_amount');
+            $table->double('pdc_amount');
             $table->text('pdc_status');
-            $table->text('pdc_returned');
+            $table->integer('pdc_returned');
             $table->integer('date_payment');
             $table->double('payment_change');
             $table->integer('fully_paid');

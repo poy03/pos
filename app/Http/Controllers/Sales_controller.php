@@ -16,9 +16,9 @@ class Sales_controller extends Controller
     {
       $data["has_customer"] = FALSE;
       $data["has_salesman"] = FALSE;
-      $data["term"] = 0;
-      $data["comments"] = "";
-      $data["type_price"] = 'srp';
+      $data["type_price"] = ($request->session()->has('sales_dr.type_price')?$request->session()->get('sales_dr.type_price'):'srp');
+      $data["term"] = ($request->session()->has('sales_dr.term')?$request->session()->get('sales_dr.term'):'');
+      $data["comments"] = ($request->session()->has('sales_dr.comments')?$request->session()->get('sales_dr.comments'):'');
       if($request->session()->has('sales_dr.customer_data')&&$request->session()->get('sales_dr.customer_data')!=array()){
         $data["has_customer"] = TRUE;
         $data["customer_data"] = $request->session()->get('sales_dr.customer_data');
@@ -27,15 +27,6 @@ class Sales_controller extends Controller
         $data["has_salesman"] = TRUE;
         $data["salesman_data"] = $request->session()->get('sales_dr.salesman_data');
       }
-      if($request->session()->has('sales_dr.type_price')){
-        $data["type_price"] = $request->session()->get('sales_dr.type_price');
-      }
-      if($request->session()->has('sales_dr.term')){
-        $data["term"] = $request->session()->get('sales_dr.term');
-      }
-      if($request->session()->has('sales_dr.comments')){
-        $data["comments"] = $request->session()->get('sales_dr.comments');
-      }
       return view('sales',$data);
     }
 
@@ -43,21 +34,16 @@ class Sales_controller extends Controller
     {
       if($request->type&&$request->type=="items"){
         $items = new Items;
-        if($request->session()->has('sales_dr.items.'.$request->id)&&$request->session()->get('sales_dr.items.'.$request->id)!=array()) {
+        if ($request->session()->has('sales_dr.items.'.$request->id)&&$request->session()->get('sales_dr.items.'.$request->id)!=array()) {
           $data = $request->session()->get('sales_dr');
           $data["items"][$request->id] = [
             'quantity'=> $data["items"][$request->id]['quantity']+1,
             'price' => 0,
             'costprice' => 0,
           ];
-          if($request->session()->has('sales_dr.type_price')){
-              $data["type_price"] = $request->session()->get('sales_dr.type_price');
-          }else{
-            $data["type_price"] = 'srp';
-          }
           $request->session()->put('sales_dr', $data);
         }else{
-          if($request->session()->has('sales_dr.items')&&$request->session()->get('sales_dr.items')!=array()) {
+          if ($request->session()->has('sales_dr.items')&&$request->session()->get('sales_dr.items')!=array()) {
             $data = $request->session()->get('sales_dr');
             $data["items"][$request->id] = [
               'quantity'=> 1,
@@ -71,14 +57,11 @@ class Sales_controller extends Controller
               'costprice' => 0,
             ];
           }
-          if($request->session()->has('sales_dr.type_price')){
-              $data["type_price"] = $request->session()->get('sales_dr.type_price');
-          }else{
-            $data["type_price"] = 'srp';
-          }
+          $data["type_price"] = ($request->session()->has('sales_dr.type_price')?$request->session()->get('sales_dr.type_price'):'srp');
+          $data["term"] = ($request->session()->has('sales_dr.term')?$request->session()->get('sales_dr.term'):'');
           $request->session()->put('sales_dr', $data);
         }
-      }elseif($request->type&&$request->type=="customer") {
+      }elseif ($request->type&&$request->type=="customer") {
         $customers = new Customers; 
         $customer_data = $customers->where("customerID",$request->id)->first();
         if($request->session()->has('sales_dr')&&$request->session()->get('sales_dr')!=array()){
@@ -88,9 +71,8 @@ class Sales_controller extends Controller
           "customerID" => $request->id,
           "customer_name" => $customer_data->companyname,
         ];
-        $data["term"] = $customer_data->term;
         $request->session()->put('sales_dr', $data);
-      }elseif($request->type&&$request->type=="salesman") {
+      }elseif ($request->type&&$request->type=="salesman") {
         $salesman = new Salesman; 
         $salesman_data = $salesman->where("salesmanID",$request->id)->first();
         if($request->session()->has('sales_dr')&&$request->session()->get('sales_dr')!=array()){
@@ -102,7 +84,7 @@ class Sales_controller extends Controller
         ];
         $request->session()->put('sales_dr', $data);
       }
-          return $data;
+      return $data;
     }
 
     public function drcart_update(Request $request)
@@ -110,45 +92,37 @@ class Sales_controller extends Controller
       $items = new Items;
       $data = $request->session()->get('sales_dr');
       if($request->price){
-        $this->validate($request, [
-            'price' => 'numeric'
-        ]);
         $data["items"][$request->id]["price"] = abs($request->price);
         $request->session()->put('sales_dr', $data);
-      }elseif($request->quantity) {
-        $this->validate($request, [
-            'quantity' => 'numeric'
-        ]);
+      }elseif ($request->quantity) {
         $data["items"][$request->id]["quantity"] = abs($request->quantity);
         $request->session()->put('sales_dr', $data);
-      }elseif($request->costprice) {
-        $this->validate($request, [
-            'costprice' => 'numeric'
-        ]);
+      }elseif ($request->costprice) {
         $data["items"][$request->id]["costprice"] = abs($request->costprice);
         $request->session()->put('sales_dr', $data);
-      }elseif($request->type_price) {
-        $data["type_price"] = ($request->type_price=="srp"||$request->type_price=="price_to_distributors"?$request->type_price:"srp");
+      }elseif ($request->type_price) {
+        $data["type_price"] = $request->type_price;
         $request->session()->put('sales_dr', $data);
-      }elseif($request->term||$request->term=="0") {
-        $this->validate($request, [
-            'term' => 'numeric'
-        ]);
+      }elseif ($request->term) {
         $data["term"] = $request->term;
         $request->session()->put('sales_dr', $data);
-      }elseif($request->comments) {
+      }elseif ($request->comments) {
         $data["comments"] = $request->comments;
         $request->session()->put('sales_dr', $data);
-      }elseif($request->reset&&$request->reset=="price") {
-        foreach ($data["items"] as $key => $items) {
-          $data["items"][$key]["price"] = 0;
+      }elseif ($request->type=="reset_price") {
+        if($request->session()->get('sales_dr.items')!=array()){
+          foreach ($request->session()->get('sales_dr.items') as $key => $value) {
+            $data["items"][$key]["price"] = 0;
+          }
+          $request->session()->put('sales_dr', $data);
         }
-        $request->session()->put('sales_dr', $data);
-      }elseif($request->reset&&$request->reset=="costprice") {
-        foreach ($data["items"] as $key => $items) {
-          $data["items"][$key]["costprice"] = 0;
+      }elseif ($request->type=="reset_costprice") {
+        if($request->session()->get('sales_dr.items')!=array()){
+          foreach ($request->session()->get('sales_dr.items') as $key => $value) {
+            $data["items"][$key]["costprice"] = 0;
+          }
+          $request->session()->put('sales_dr', $data);
         }
-        $request->session()->put('sales_dr', $data);
       }
         
     }    
@@ -159,7 +133,7 @@ class Sales_controller extends Controller
       // exit;
       $items = new Items;
       $cart_data = $request->session()->get('sales_dr');
-        if($request->session()->has('sales_dr.items')&&$request->session()->get('sales_dr.items')!=array()) {
+        if ($request->session()->has('sales_dr.items')&&$request->session()->get('sales_dr.items')!=array()) {
           $cart_data["total"] = 0;
           foreach ($cart_data["items"] as $key => $cart_data_item) {
             $item_data = $items->where("itemID",$key)->first();
@@ -189,7 +163,7 @@ class Sales_controller extends Controller
       // exit;
       $items = new Items;
       $cart_data = $request->session()->get('sales_dr');
-      if($request->session()->has('sales_dr.items')) {
+      if ($request->session()->has('sales_dr.items')) {
         $cart_data["total"] = 0;
         foreach ($cart_data["items"] as $key => $cart_data_item) {
           $item_data = $items->where("itemID",$key)->first();
@@ -213,17 +187,39 @@ class Sales_controller extends Controller
         if($request->id){
           $request->session()->forget('sales_dr.items.'.$request->id);
         }else{
-          $request->session()->forget('sales_dr');
+          $request->session()->forget('sales_dr.items');
         }
-      }elseif($request->type&&$request->type=="customers") {
+      }elseif ($request->type&&$request->type=="customers") {
         $request->session()->forget('sales_dr.customer_data');
-      }elseif($request->type&&$request->type=="salesman") {
-        $request->session()->forget('sales_dr.salesman_data');
+      }elseif ($request->type&&$request->type=="salesman") {
+        $request->session()->forget('sales_dr.salesmanr_data');
+      }elseif ($request->type&&$request->type=="cart") {
+        $request->session()->forget('sales_dr');
       }
     }
 
-    public function drcart_d(Request $request)
+    public function dr_create(Request $request)
     {
-      $request->session()->forget('sales_dr');
+      $items = new Items;
+      $cart_data = $request->session()->get("sales_dr.items");
+      foreach ($cart_data as $itemID => $item_cart) {
+        $valid_items = TRUE;
+        $item_data = $items->where("itemID",$itemID)->where("deleted",0)->first();
+        if($item_data==NULL){
+          $valid_items = FALSE;
+          break;
+        }
+        if($item_data->quantity < $item_cart["quantity"]){
+            $valid_items = FALSE;
+            break;
+        }
+        if(!$valid_items){
+          break;
+        }
+      }
+      if(!$valid_items){
+        return response('Hello World', 422);
+      }
+      
     }
 }

@@ -13,8 +13,8 @@ class CreateSalesmanTable extends Migration
     public function up()
     {
         //
-        Schema::create('salesman', function (Blueprint $table) {
-            $table->increments('id');
+        Schema::create('tbl_salesman', function (Blueprint $table) {
+            $table->increments('salesmanID');
             $table->string('salesman_name', 150);
             $table->string('salesman_address', 150);
             $table->string('salesman_contact_number', 150);
@@ -29,6 +29,7 @@ class CreateSalesmanTable extends Migration
      */
     public function down()
     {
+        //
         Schema::dropIfExists('tbl_salesman');
     }
 }

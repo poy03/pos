@@ -58,6 +58,7 @@ Route::get('payables','Ap_controller@index');
 Route::get('expenses','Expenses_controller@index');
 
 Route::get('sales','Sales_controller@index');
+Route::post('sales','Sales_controller@dr_create');
 Route::get('sales/drcart_t','Sales_controller@drcart_t');
 Route::get('sales/drcart_d','Sales_controller@drcart_d');
 Route::get('sales/drcart','Sales_controller@drcart');

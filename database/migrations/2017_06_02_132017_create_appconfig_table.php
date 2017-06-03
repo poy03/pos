@@ -12,6 +12,7 @@ class CreateAppconfigTable extends Migration
      */
     public function up()
     {
+        //
         Schema::create('app_config', function (Blueprint $table) {
             $table->increments('id');
             $table->string('app_name', 100);
@@ -19,10 +20,10 @@ class CreateAppconfigTable extends Migration
             $table->string('address', 100);
             $table->string('contact_number', 100);
             $table->string('app_company_name', 100);
+            $table->float('maximum_items_displayed');
             $table->text('logo');
             $table->integer('accounting_period');
-            $table->integer('statement_id');
-            $table->string('version', 20);
+            $table->integer('statementID');
         });
     }
 
@@ -33,6 +34,7 @@ class CreateAppconfigTable extends Migration
      */
     public function down()
     {
+        //
         Schema::dropIfExists('app_config');
     }
 }

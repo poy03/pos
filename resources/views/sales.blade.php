@@ -15,7 +15,7 @@
       <div class='col-sm-6'>
         <label>Add Item:</label>
         <div class = "form-group">
-           <input type = "text" class = "form-control" name='itemname' id='item-add-cart-cat' autocomplete='off' placeholder='Type for Category'>
+           <input type = "text" class = "form-control" name='itemname' id='itemsearch_cat' autocomplete='off' placeholder='Type for Category'>
         </div>    
       </div>
     </div>
@@ -52,7 +52,10 @@
 
 
   <div class='col-sm-2'>
-
+    <form action="/sales" method="post" id="sales_dr-form">
+    {{ csrf_field() }}
+      
+    </form>
     <div class="form-group">
       <label>Delivery Receipt</label>
       <input type='number' class='form-control' name='dr_number' required>
@@ -66,7 +69,7 @@
         <button class="btn btn-danger" type="button" id="customer-cart-remove-btn" data-balloon="Remove Customer" data-balloon-pos="up">&times;</button>
       </span>
       @else
-      <input tabindex="-1" type="text" class="form-control" id="customer-add-cart" name="Customer" placeholder="Type for Customer Name" autocomplete="off">
+      <input tabindex="-1" type="text" class="form-control" id="customer-add-cart" name="Customer" placeholder="Type for Customer Name" value="" autocomplete="off">
       <span class="input-group-btn" id="customer-cart-btn">
         <button class="btn btn-success btn-add-customers" type="button">Add</button>
       </span>
@@ -78,7 +81,7 @@
       @if($has_salesman)
       <input type='text' id='salesman-add-cart' class='form-control' placeholder='Type for Salesman Name' value="{{$salesman_data['salesman_name']}}" disabled>
       <span class="input-group-btn" id="salesman-cart-btn">
-        <button class="btn btn-danger" type="button" id="salesman-cart-remove-btn" data-balloon="Remove Salesman" data-balloon-pos="up">&times;</button>
+        <button class="btn btn-danger" type="button" id="salesman-cart-remove-btn" data-balloon="Remove Customer" data-balloon-pos="up">&times;</button>
       </span>
       @else
       <input type='text' id='salesman-add-cart' class='form-control' placeholder='Type for Salesman Name'>
@@ -91,28 +94,31 @@
     <div class="form-group">
       <label>Type of Price:</label>
       <select id='type_price' name="type_price" class='form-control'>
-        <option value='srp' {{ ($type_price=='srp' ? 'selected="selected"' : false) }}>Suggested Retail Price</option>
-        <option value='price_to_distributors' {{ ($type_price=='price_to_distributors' ? 'selected="selected"' : false) }}>Dealers Price</option>
+        <option value='srp' {{ ($type_price=="srp"?'selected="selected"':false) }}>Suggested Retail Price</option>
+        <option value='price_to_distributors' {{ ($type_price=="price_to_distributors"?'selected="selected"':false) }}>Price to Distributors</option>
       </select>
     </div>
 
     
     <div class="form-group">
       <label>Terms:</label>
-      <input type='number' min='0' name='term' class='form-control' id='term' placeholder='Number of Days' value='{{$term}}'>
+      <input type='number' min='0' name='term' value="{{$term}}" class='form-control' id='term' placeholder='Number of Days' value='0'>
     </div>
     <div class="form-group">
       <label>Comments:</label>
-      <textarea name='comments' id='comments' class='form-control'>{{$comments}}</textarea>
+      <textarea name='comments' class='form-control' id="comments">{{$comments}}</textarea>
     </div>
     <div class="form-group">
       <label>Sales Register:</label>
-      <button class='btn btn-primary btn-block' name='save'  id="sales-submit">
+      <button type="submit" class='btn btn-primary btn-block' form="sales_dr-form">
         <span class='glyphicon glyphicon-floppy-disk'></span> Save & Continue
       </button>
-      <a class='btn btn-danger btn-block' name='delete' id='delall'>
-        <span class='glyphicon glyphicon-trash'></span> Cancel Sale
-      </a>
+      <button class='btn btn-danger btn-block' id='clear_items'>
+        <span class='glyphicon glyphicon-trash'></span> Clear All Items
+      </button>
+      <button class='btn btn-danger btn-block' id='clear_cart'>
+        <span class='glyphicon glyphicon-trash'></span> Clear Sales Cart
+      </button>
     </div>
 
     <div class="form-group">
@@ -141,7 +147,7 @@
 <script type="text/javascript">
 $(document).ready(function(e) {
   $("#item-add-cart").autocomplete({
-      source: '/search/items/sales?search_by=itemname',
+      source: '/search/items/sales',
       select: function(event, ui){
         $.ajax({
           type: "POST",
@@ -152,23 +158,6 @@ $(document).ready(function(e) {
           complete: function() {
             show_cart();
             $("#item-add-cart").val("");
-          }
-        });
-      }
-  });
-
-  $("#item-add-cart-cat").autocomplete({
-      source: '/search/items/sales?search_by=category',
-      select: function(event, ui){
-        $.ajax({
-          type: "POST",
-          url: "/sales/drcart",
-          data: "_token=<?php echo csrf_token(); ?>"+"&id="+ui.item.data+"&type=items",
-          cache: false,
-          dataType: "json",
-          complete: function() {
-            show_cart();
-            $("#item-add-cart-cat").val("");
           }
         });
       }
@@ -186,7 +175,6 @@ $(document).ready(function(e) {
           success: function(data) {
             $("#customer-add-cart").prop("disabled",true);
             $("#customer-cart-btn").html('<button class="btn btn-danger" type="button" id="customer-cart-remove-btn" data-balloon="Remove Customer" data-balloon-pos="up">&times;</button>');
-            $("#term").val(data.term);
           }
         });
       }
@@ -203,10 +191,7 @@ $(document).ready(function(e) {
           dataType: "json",
           success: function(data) {
             $("#salesman-add-cart").prop("disabled",true);
-            $("#salesman-cart-btn").html('<button class="btn btn-danger" type="button" id="salesman-cart-remove-btn" data-balloon="Remove Salesman" data-balloon-pos="up">&times;</button>');
-          },
-          error: function(data) {
-            console.log(data.responseText);
+            $("#salesman-cart-btn").html('<button class="btn btn-danger" type="button" id="salesman-cart-remove-btn" data-balloon="Remove Customer" data-balloon-pos="up">&times;</button>');
           }
         });
       }
@@ -235,62 +220,10 @@ $(document).ready(function(e) {
       success: function(data) {
         $("#salesman-add-cart").prop("disabled",false);
         $("#salesman-add-cart").val("");
-        $("#salesman-cart-btn").html('<button class="btn btn-success btn-add-salesman" type="button">Add</button>');
+        $("#salesman-cart-btn").html('<button class="btn btn-success btn-add-customers" type="button">Add</button>');
       }
     });
   });
-
-  $(document).on("change","#type_price",function(e) {
-    $.ajax({
-      type: "PUT",
-      url: "/sales/drcart",
-      data: "_token=<?php echo csrf_token(); ?>"+"&type_price="+e.target.value,
-      cache: false,
-      beforeSend: function() {
-
-      },
-      success: function(data) {
-        show_cart();
-      },
-      complete: function() {
-
-      }
-    });
-  })
-
-  $(document).on("change","#term",function(e) {
-    $.ajax({
-      type: "PUT",
-      url: "/sales/drcart",
-      data: "_token=<?php echo csrf_token(); ?>"+"&term="+e.target.value,
-      cache: false,
-      beforeSend: function() {
-
-      },
-      success: function(data) {
-      },
-      complete: function() {
-
-      }
-    });
-  })
-
-  $(document).on("change","#comments",function(e) {
-    $.ajax({
-      type: "PUT",
-      url: "/sales/drcart",
-      data: "_token=<?php echo csrf_token(); ?>"+"&comments="+e.target.value,
-      cache: false,
-      beforeSend: function() {
-
-      },
-      success: function(data) {
-      },
-      complete: function() {
-
-      }
-    });
-  })
 
   $(document).on("change keyup",".price",function(e) {
     var id = e.target.id;
@@ -367,8 +300,119 @@ $(document).ready(function(e) {
     });
   });
 
+  $(document).on("change","#type_price",function(e) {
+    $.ajax({
+      type: "PUT",
+      url: "/sales/drcart",
+      data: "_token=<?php echo csrf_token(); ?>"+"&type_price="+e.target.value,
+      cache: false,
+      beforeSend: function() {
 
-  $(document).on("click",".delete",function(e) {
+      },
+      success: function(data) {
+        show_cart();
+      },
+      complete: function() {
+       
+      }
+    });
+  });
+
+  $(document).on("keyup change","#term",function(e) {
+    $.ajax({
+      type: "PUT",
+      url: "/sales/drcart",
+      data: "_token=<?php echo csrf_token(); ?>"+"&term="+e.target.value,
+      cache: false
+    });
+  });
+
+  $(document).on("keyup change","#comments",function(e) {
+    $.ajax({
+      type: "PUT",
+      url: "/sales/drcart",
+      data: "_token=<?php echo csrf_token(); ?>"+"&comments="+e.target.value,
+      cache: false
+    });
+  });
+
+  $(document).on("click","#reset_price",function(e) {
+    $.ajax({
+      type: "PUT",
+      url: "/sales/drcart",
+      data: "_token=<?php echo csrf_token(); ?>"+"&type=reset_price",
+      cache: false,
+      success: function() {
+        show_cart();
+      }
+    });
+  }); 
+
+  $(document).on("click","#reset_costprice",function(e) {
+    $.ajax({
+      type: "PUT",
+      url: "/sales/drcart",
+      data: "_token=<?php echo csrf_token(); ?>"+"&type=reset_costprice",
+      cache: false,
+      success: function() {
+        show_cart();
+      }
+    });
+  }); 
+
+  $(document).on("click","#clear_cart",function(e) {
+    alertify.confirm(
+      'Clear All Items',
+      'Are you sure you want to clear all data in the sales cart? This action is irreversible.',
+      function(){
+        $.ajax({
+          type: "DELETE",
+          url: "/sales/drcart",
+          data: "_token=<?php echo csrf_token(); ?>"+"&type=cart",
+          cache: false
+        });
+        var msg = alertify.success('All data in the sales cart are cleared. Reloading the page.');
+        msg.callback = function (isClicked) {
+          if(isClicked){
+            location.reload();
+          }
+          else{  
+            location.reload();
+          }
+        };
+      },
+      function(){
+        alertify.error('Cancel');
+      }
+    );
+  }); 
+
+  $(document).on("click","#clear_items",function(e) {
+
+    alertify.confirm(
+      'Clear All Items',
+      'Are you sure you want to clear all items in the sales cart? This action is irreversible.',
+      function(){
+        $.ajax({
+          type: "DELETE",
+          url: "/sales/drcart",
+          data: "_token=<?php echo csrf_token(); ?>"+"&type=items",
+          cache: false,
+          success: function() {
+            show_cart();
+          }
+        });
+        alertify.success('Items in the sales cart are cleared');
+      },
+      function(){
+        alertify.error('Cancel');
+      }
+    );
+
+  });
+
+
+  $(document).on("click",".delete_cart_item",function(e) {
     var id = e.target.id;
     $.ajax({
       type: "DELETE",
@@ -381,43 +425,27 @@ $(document).ready(function(e) {
     });
   });
 
-  $(document).on("click","#reset_price",function(e) {
-    var id = e.target.id;
+  $(document).on("submit","#sales_dr-form",function(e) {
+    // e.preventDefault();
     $.ajax({
-      type: "PUT",
-      url: "/sales/drcart",
-      data: "_token=<?php echo csrf_token(); ?>"+"&reset=price",
+      type: "POST",
+      url: $("#sales_dr-form").attr("action"),
+      data: $("#sales_dr-form").serialize(),
       cache: false,
-      beforeSend: function() {
-
+      beforeSend: function(){
+        $('button[form="sales_dr-form"]').prop("disabled",true);
       },
-      success: function(data) {
-        show_cart();
+      success: function(data){
+        console.log(data)
+      },
+      error: function(e) {
+        
       },
       complete: function() {
-
+        $('button[form="sales_dr-form"]').prop("disabled",false);
       }
     });
-  });
-
-  $(document).on("click","#reset_costprice",function(e) {
-    var id = e.target.id;
-    $.ajax({
-      type: "PUT",
-      url: "/sales/drcart",
-      data: "_token=<?php echo csrf_token(); ?>"+"&reset=costprice",
-      cache: false,
-      beforeSend: function() {
-
-      },
-      success: function(data) {
-        show_cart();
-      },
-      complete: function() {
-
-      }
-    });
-  });
+  })
 
   show_cart();
   function show_cart() {
@@ -435,7 +463,7 @@ $(document).ready(function(e) {
           for (var i in data.items) {
             if (data.items.hasOwnProperty(i)) {
               $(selector+" tbody").append('<tr>\
-                <td><a class="delete" id="'+i+'" href="#">&times</a></td>\
+                <td><a class="delete_cart_item" id="'+i+'" href="#">&times</a></td>\
                 <td>'+data.items[i].itemname+'</td>\
                 <td>'+data.items[i].item_code+'</td>\
                 <td>'+data.items[i].remaining_quantity+'</td>\
