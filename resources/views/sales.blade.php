@@ -58,7 +58,11 @@
     </form>
     <div class="form-group">
       <label>Delivery Receipt</label>
-      <input type='number' class='form-control' name='dr_number' required>
+      @if($has_dr)
+      <input type='number' class='form-control' name='dr_number' value="{{$dr_data->orderID}}" disabled>
+      @else
+      <input type='number' class='form-control' name='dr_number' id="dr_number">
+      @endif
     </div>
 
     <label>Customer:</label>
@@ -470,13 +474,13 @@ $(document).ready(function(e) {
                 <td><input type="number" class="costprice" id="'+i+'" value="'+data.items[i].costprice+'"></td>\
                 <td><input type="number" class="quantity" id="'+i+'" value="'+data.items[i].quantity+'" max="'+data.items[i].remaining_quantity+'"></td>\
                 <td><input type="number" class="price" id="'+i+'" value="'+data.items[i].price+'"></td>\
-                <td style="text-align:right"><span class="line_total" id="'+i+'">'+data.items[i].line_total+'</span></td>\
+                <td style="text-align:right"><span class="line_total" id="'+i+'">'+data.items[i].line_sales_total+'</span></td>\
                 </tr>');
             }
           }
           $(selector+" tfoot").html('<tr>\
             <th colspan="7" style="text-align:right">Total:</th>\
-            <th style="text-align:right"><span id="total">'+data.total+'</span></th>\
+            <th style="text-align:right"><span id="total">'+data.total_sales+'</span></th>\
             </tr>'); 
         }
       }
