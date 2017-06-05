@@ -8,7 +8,7 @@ use App\Http\Requests;
 
 class Reports_controller extends Controller
 {
-    public function index($value='')
+    public function index(Request $request)
     {
     	return view('reports');
     }

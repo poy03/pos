@@ -10,9 +10,11 @@ use App\Users;
 
 class Users_controller extends Controller
 {
-    public function index($value='')
+    public function index(Request $request)
     {
-    	return view('users');
+        $users = new Users;
+        $data["user_data"] = $users->where("accountID",$request->session()->get('user'))->first();
+    	return view('users',$data);
     }
     public function store(Request $request)
     {

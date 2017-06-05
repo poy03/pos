@@ -7,12 +7,15 @@ use DB;
 use App\Http\Requests;
 use Validator;
 use App\Suppliers;
+use App\Users;
 
 class Suppliers_controller extends Controller
 {
-    public function index($value='')
+    public function index(Request $request)
     {
-    	return view("suppliers");
+        $users = new Users;
+        $data["user_data"] = $users->where("accountID",$request->session()->get('user'))->first();
+    	return view("suppliers",$data);
     }
 
     public function store(Request $request)

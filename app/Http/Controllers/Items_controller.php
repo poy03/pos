@@ -7,14 +7,18 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Requests;
 use Validator;
 use App\Items;
+use App\Users;
 use App\Suppliers;
 use App\Items_history;
 
 class Items_controller extends Controller
 {
-    public function index($value='')
+    public function index(Request $request)
     {
-        return view('items');
+        $users = new Users;
+        $data["user_data"] = $users->where("accountID",$request->session()->get('user'))->first();
+        // return $data["user_data"];
+        return view('items',$data);
     }
 
     public function store(Request $request)
@@ -53,6 +57,7 @@ class Items_controller extends Controller
         $history->remarks = "Manual edit";
         $history->ref_id = 0;
         $history->date_time = strtotime(date("m/d/Y"));
+        $history->accountID = $request->session()->get('user');
         $history->save();
 
         return $item_data;

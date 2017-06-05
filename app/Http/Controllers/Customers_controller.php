@@ -7,12 +7,15 @@ use DB;
 use App\Http\Requests;
 use Validator;
 use App\Customers;
+use App\Users;
 
 class Customers_controller extends Controller
 {
-    public function index($value='')
+    public function index(Request $request)
     {
-    	 return view('customers');
+        $users = new Users;
+        $data["user_data"] = $users->where("accountID",$request->session()->get('user'))->first();
+        return view('customers',$data);
     }
 
     public function store(Request $request)

@@ -6,25 +6,30 @@ use Illuminate\Http\Request;
 use DB;
 use Validator;
 use App\Http\Requests;
-use App\Items;
 use App\Sales_dr;
 use App\Sales_dr_details;
 use App\Payments;
 use App\Customers;
 use App\Salesman;
+use App\Items;
+use App\Users;
+use App\Items_history;
 
 class Sales_controller extends Controller
 {
     public function index(Request $request)
     {
+      $users = new Users;
+      $data["user_data"] = $users->where("accountID",$request->session()->get('user'))->first();
       $data["has_customer"] = FALSE;
       $data["has_salesman"] = FALSE;
       $sales_dr = new Sales_dr;
       if($sales_dr->count()==0){
         $data["has_dr"] = FALSE;
+        $data["dr_data"]["orderID"] = ($request->session()->has("sales_dr.dr_number")?$request->session()->get("sales_dr.dr_number"):"");
       }else{
         $data["has_dr"] = TRUE;
-        $data["dr_data"] = $sales_dr->order_by("orderID","DESC")->first();
+        $data["dr_data"] = $sales_dr->where("deleted",0)->orderBy("orderID","DESC")->first();
       }
       $data["type_price"] = ($request->session()->has('sales_dr.type_price')?$request->session()->get('sales_dr.type_price'):'srp');
       $data["term"] = ($request->session()->has('sales_dr.term')?$request->session()->get('sales_dr.term'):'');
@@ -37,7 +42,7 @@ class Sales_controller extends Controller
         $data["has_salesman"] = TRUE;
         $data["salesman_data"] = $request->session()->get('sales_dr.salesman_data');
       }
-      return view('sales',$data);
+      return view('salesdr',$data);
     }
 
     public function drcart_store(Request $request)
@@ -48,8 +53,8 @@ class Sales_controller extends Controller
           $data = $request->session()->get('sales_dr');
           $data["items"][$request->id] = [
             'quantity'=> $data["items"][$request->id]['quantity']+1,
-            'price' => 0,
-            'costprice' => 0,
+            'price' => $data["items"][$request->id]["price"],
+            'costprice' => $data["items"][$request->id]["costprice"],
           ];
           $request->session()->put('sales_dr', $data);
         }else{
@@ -69,6 +74,7 @@ class Sales_controller extends Controller
           }
           $data["type_price"] = ($request->session()->has('sales_dr.type_price')?$request->session()->get('sales_dr.type_price'):'srp');
           $data["term"] = ($request->session()->has('sales_dr.term')?$request->session()->get('sales_dr.term'):'');
+          $data["dr_number"] = ($request->session()->has('sales_dr.dr_number')?$request->session()->get('sales_dr.dr_number'):'');
           $request->session()->put('sales_dr', $data);
         }
       }elseif ($request->type&&$request->type=="customer") {
@@ -116,6 +122,9 @@ class Sales_controller extends Controller
       }elseif ($request->term) {
         $data["term"] = $request->term;
         $request->session()->put('sales_dr', $data);
+      }elseif ($request->dr_number) {
+        $data["dr_number"] = $request->dr_number;
+        $request->session()->put('sales_dr', $data);
       }elseif ($request->comments) {
         $data["comments"] = $request->comments;
         $request->session()->put('sales_dr', $data);
@@ -142,7 +151,8 @@ class Sales_controller extends Controller
       $items = new Items;
       $cart_data = $request->session()->get('sales_dr');
         if ($request->session()->has('sales_dr.items')&&$request->session()->get('sales_dr.items')!=array()) {
-          $cart_data["total"] = 0;
+          $cart_data["total_sales"] = 0;
+          $cart_data["total_costprice"] = 0;
           foreach ($cart_data["items"] as $key => $cart_data_item) {
             $item_data = $items->where("itemID",$key)->first();
             $cart_data["items"][$key]["itemname"] = $item_data->itemname;
@@ -154,39 +164,29 @@ class Sales_controller extends Controller
             if($cart_data["items"][$key]["costprice"]==0){
                 $cart_data["items"][$key]["costprice"] = $item_data->costprice;
             }
-            $cart_data["items"][$key]["line_sales_total"] = $cart_data["items"][$key]["price"]*$cart_data["items"][$key]["quantity"];
-            $cart_data["items"][$key]["line_sales_total_int"] = $cart_data["items"][$key]["line_sales_total"];
-            $cart_data["items"][$key]["line_sales_total"] = number_format($cart_data["items"][$key]["line_sales_total"],2);
-            $cart_data["total"] += $cart_data["items"][$key]["line_sales_total_int"];
+            $cart_data["items"][$key]["line_price_total"] = $cart_data["items"][$key]["price"]*$cart_data["items"][$key]["quantity"];
+            $cart_data["items"][$key]["line_price_total_int"] = $cart_data["items"][$key]["line_price_total"];
+            $cart_data["items"][$key]["line_price_total"] = number_format($cart_data["items"][$key]["line_price_total"],2);
+            $cart_data["total_sales"] += $cart_data["items"][$key]["line_price_total_int"];
+            
+            $cart_data["items"][$key]["line_costprice_total"] = $cart_data["items"][$key]["costprice"]*$cart_data["items"][$key]["quantity"];
+            $cart_data["items"][$key]["line_costprice_total_int"] = $cart_data["items"][$key]["line_costprice_total"];
+            $cart_data["items"][$key]["line_costprice_total"] = number_format($cart_data["items"][$key]["line_costprice_total"],2);
+            $cart_data["total_costprice"] += $cart_data["items"][$key]["line_costprice_total_int"];
+
           }
-          $cart_data["total_int"] = $cart_data["total"];
-          $cart_data["total"] = number_format($cart_data["total"],2);
+          $cart_data["total_sales_int"] = $cart_data["total_sales"];
+          $cart_data["total_sales"] = number_format($cart_data["total_sales"],2);
+
+          $cart_data["total_costprice_int"] = $cart_data["total_costprice"];
+          $cart_data["total_costprice"] = number_format($cart_data["total_costprice"],2);
         }
       return $cart_data;
     }
 
     public function drcart_t(Request $request)
     {
-      dd($request->session()->get('sales_dr'));
-      // exit;
-      $items = new Items;
-      $cart_data = $request->session()->get('sales_dr');
-      if ($request->session()->has('sales_dr.items')) {
-        $cart_data["total"] = 0;
-        foreach ($cart_data["items"] as $key => $cart_data_item) {
-          $item_data = $items->where("itemID",$key)->first();
-          $cart_data["items"][$key]["itemname"] = $item_data->itemname;
-          $cart_data["items"][$key]["item_code"] = $item_data->item_code;
-          $cart_data["items"][$key]["remaining_quantity"] = $item_data->quantity;
-          $cart_data["items"][$key]["costprice"] = $item_data->costprice;
-          if($cart_data["items"][$key]["price"]==0){
-              $cart_data["items"][$key]["price"] = $item_data->$cart_data["type_price"];
-          }
-          $cart_data["items"][$key]["line_sales_total"] = $cart_data["items"][$key]["price"]*$cart_data["items"][$key]["quantity"];
-          $cart_data["total"] += $cart_data["items"][$key]["line_sales_total"];
-        }
-      }
-      return $cart_data;
+      dd($request->session()->has('sales_dr'));
     }
 
     public function drcart_destroy(Request $request)
@@ -210,34 +210,88 @@ class Sales_controller extends Controller
     {
       $items = new Items;
       $cart_data_session = $request->session()->get("sales_dr.items");
-      foreach ($cart_data_session as $itemID => $item_cart) {
-        $valid_items = TRUE;
-        $item_data = $items->where("itemID",$itemID)->where("deleted",0)->first();
-        if($item_data==NULL){
-          $valid_items = FALSE;
-          break;
-        }
-        if($item_data->quantity < $item_cart["quantity"]){
+      if($cart_data_session != array()){
+        foreach ($cart_data_session as $itemID => $item_cart) {
+          $valid_items = TRUE;
+          $item_data = $items->where("itemID",$itemID)->where("deleted",0)->first();
+          if($item_data==NULL){
             $valid_items = FALSE;
             break;
+          }
+          if($item_data->quantity < $item_cart["quantity"]){
+              $valid_items = FALSE;
+              break;
+          }
+          if(!$valid_items){
+            break;
+          }
         }
         if(!$valid_items){
-          break;
+          $data["error"] = "Some errors has occured. Try Refreshing the page.";
+          return response($data, 422);
         }
-      }
-      if(!$valid_items){
-        $data["items_error"] = "Some errors has occured. Try Refreshing the page.";
+      }else{
+        $data["error"] = "No items in the sales cart.";
         return response($data, 422);
       }
 
       $cart_data = $this->drcart($request);
       $sales_dr = new Sales_dr;
+      if($sales_dr->count()==0){
+        $sales_dr->orderID = $cart_data["dr_number"];
+      }
       $sales_dr->date_ordered = strtotime(date("m/d/Y"));
       $sales_dr->time_ordered = strtotime(date("m/d/Y h:i:s A"));
-      $sales_dr->total = $cart_data["total_int"];
-      $sales_dr->customer = $cart_data["customer_data"]["customer_name"];
-      $sales_dr->balance = $cart_data["customer_data"]["customer_name"];
-      // return $cart_data["total"];
-      
+      $sales_dr->total = $cart_data["total_sales_int"];
+      $sales_dr->customer = (isset($cart_data["customer_data"])?$cart_data["customer_data"]["customer_name"]:($request->customer?$request->customer:""));
+      $sales_dr->balance = $cart_data["total_sales_int"];
+      $sales_dr->costprice = $cart_data["total_costprice_int"];
+      $sales_dr->comments = (isset($cart_data["comments"])?$cart_data["comments"]:"");
+      $sales_dr->date_due = strtotime(date("m/d/Y")." + ".($cart_data["term"]==""?0:$cart_data["term"])." days");
+      $sales_dr->overdue_date_1 = strtotime(date("m/d/Y", $sales_dr->date_due) . " +30 days");
+      $sales_dr->overdue_date_2 = strtotime(date("m/d/Y", $sales_dr->date_due) . " +60 days");
+      $sales_dr->customerID = (isset($cart_data["customer_data"])?$cart_data["customer_data"]["customerID"]:0);
+      $sales_dr->salesmanID = (isset($cart_data["salesman_data"])?$cart_data["salesman_data"]["salesmanID"]:0);
+      $sales_dr->accountID = $request->session()->get('user');
+      $sales_dr->save();
+
+      $dr_data = $sales_dr->orderBy("orderID","DESC")->first();
+
+      foreach ($cart_data_session as $itemID => $item_cart) {
+        $dr_details = new Sales_dr_details;
+        $dr_details->itemID = $itemID;
+        $dr_details->quantity = $cart_data["items"][$itemID]["quantity"];
+        $dr_details->price = $cart_data["items"][$itemID]["price"];
+        $dr_details->costprice = $cart_data["items"][$itemID]["costprice"];
+        $dr_details->subtotal = $cart_data["items"][$itemID]["quantity"]*$cart_data["items"][$itemID]["price"];
+        $dr_details->profit = ($cart_data["items"][$itemID]["line_price_total_int"]>$cart_data["items"][$itemID]["line_costprice_total_int"]?$cart_data["items"][$itemID]["line_price_total_int"]-$cart_data["items"][$itemID]["line_costprice_total_int"]:0);
+        $dr_details->loss = ($cart_data["items"][$itemID]["line_costprice_total_int"]>$cart_data["items"][$itemID]["line_price_total_int"]?$cart_data["items"][$itemID]["line_costprice_total_int"]-$cart_data["items"][$itemID]["line_price_total_int"]:0);
+        $dr_details->orderID = $dr_data->orderID;
+        $dr_details->customerID = $dr_data->customerID;
+        $dr_details->salesmanID = $dr_data->salesmanID;
+        $dr_details->accountID = $request->session()->get('user');
+        $dr_details->date_ordered = $dr_data->date_ordered;
+        $dr_details->save();
+
+
+        $items = new Items;
+        $item_data = $items->where("itemID",$itemID)->first();
+        $items->where("itemID",$itemID)->update(['quantity' => $item_data->quantity - $cart_data["items"][$itemID]["quantity"]]);
+
+        $history = new Items_history;
+        $history->itemID = $itemID;
+        $history->quantity = 0-$cart_data["items"][$itemID]["quantity"];
+        $history->type = "Out";
+        $history->remarks = "Sales";
+        $history->ref_id = $dr_data->orderID;
+        $history->accountID = $request->session()->get('user');
+        $history->date_time = strtotime(date("m/d/Y"));
+        $history->save();
+      }
+    }
+
+    public function dr(Request $request,$orderID)
+    {
+      return view('salesdr_complete'); 
     }
 }

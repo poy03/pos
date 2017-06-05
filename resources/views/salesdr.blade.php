@@ -2,6 +2,7 @@
 
 @section('title', 'Sales')
 
+
 @section('content')
 <div class='col-sm-12'>
   <div class='col-sm-10'>
@@ -54,90 +55,90 @@
   <div class='col-sm-2'>
     <form action="/sales" method="post" id="sales_dr-form">
     {{ csrf_field() }}
+
+      <div class="form-group">
+        <label>Delivery Receipt</label>
+        @if($has_dr)
+        <input type='number' class='form-control' name='dr_number' value="{{++$dr_data->orderID}}" disabled>
+        @else
+        <input type='number' class='form-control' name='dr_number' value="{{$dr_data["orderID"]}}" id="dr_number">
+        @endif
+      </div>
+
+      <label>Customer:</label>
+      <div class="input-group">
+        @if($has_customer)
+        <input tabindex="-1" type="text" class="form-control" name="customer" placeholder="Type for Customer Name" autocomplete="off" value="{{$customer_data['customer_name']}}" disabled>
+        <span class="input-group-btn" id="customer-cart-btn">
+          <button class="btn btn-danger" type="button" id="customer-cart-remove-btn" data-balloon="Remove Customer" data-balloon-pos="up">&times;</button>
+        </span>
+        @else
+        <input tabindex="-1" type="text" class="form-control" id="customer-add-cart" name="customer" placeholder="Type for Customer Name" value="" autocomplete="off">
+        <span class="input-group-btn" id="customer-cart-btn">
+          <button class="btn btn-success btn-add-customers" type="button">Add</button>
+        </span>
+        @endif
+      </div>
+
+      <label>Salesman:</label>
+      <div class="input-group">
+        @if($has_salesman)
+        <input type='text' id='salesman-add-cart' class='form-control' placeholder='Type for Salesman Name' value="{{$salesman_data['salesman_name']}}" disabled>
+        <span class="input-group-btn" id="salesman-cart-btn">
+          <button class="btn btn-danger" type="button" id="salesman-cart-remove-btn" data-balloon="Remove Customer" data-balloon-pos="up">&times;</button>
+        </span>
+        @else
+        <input type='text' id='salesman-add-cart' class='form-control' placeholder='Type for Salesman Name'>
+        <span class="input-group-btn" id="salesman-cart-btn">
+          <button class="btn btn-success btn-add-salesman" type="button">Add</button>
+        </span>
+        @endif
+      </div>
+
+      <div class="form-group">
+        <label>Type of Price:</label>
+        <select id='type_price' name="type_price" class='form-control'>
+          <option value='srp' {{ ($type_price=="srp"?'selected="selected"':false) }}>Suggested Retail Price</option>
+          <option value='price_to_distributors' {{ ($type_price=="price_to_distributors"?'selected="selected"':false) }}>Price to Distributors</option>
+        </select>
+      </div>
+
       
+      <div class="form-group">
+        <label>Terms:</label>
+        <input type='number' min='0' name='term' value="{{$term}}" class='form-control' id='term' placeholder='Number of Days' value='0'>
+      </div>
+      <div class="form-group">
+        <label>Comments:</label>
+        <textarea name='comments' class='form-control' id="comments">{{$comments}}</textarea>
+      </div>
+      <div class="form-group">
+        <label>Sales Register:</label>
+        <button type="submit" class='btn btn-primary btn-block' form="sales_dr-form">
+          <span class='glyphicon glyphicon-floppy-disk'></span> Save & Continue
+        </button>
+        <button type="button" class='btn btn-danger btn-block' id='clear_items'>
+          <span class='glyphicon glyphicon-trash'></span> Clear All Items
+        </button>
+        <button type="button" class='btn btn-danger btn-block' id='clear_cart'>
+          <span class='glyphicon glyphicon-trash'></span> Clear Sales Cart
+        </button>
+      </div>
+
+      <div class="form-group">
+        <label>TS Number:</label>
+        <input type='text' class='form-control' id='search_ts' placeholder='TS Number' autocomplete='off' name='ts_orderID'>
+      </div>
+      <div class="form-group">
+        <label>Utilities:</label>
+        <button class='btn btn-info btn-block' id='reset_price'>
+          <span class='glyphicon glyphicon-refresh'></span> Reset All Prices
+        </button>
+        <button class='btn btn-info btn-block' id='reset_costprice'>
+          <span class='glyphicon glyphicon-refresh'></span> Reset All Cost Price
+        </button>
+      </div>
     </form>
-    <div class="form-group">
-      <label>Delivery Receipt</label>
-      @if($has_dr)
-      <input type='number' class='form-control' name='dr_number' value="{{$dr_data->orderID}}" disabled>
-      @else
-      <input type='number' class='form-control' name='dr_number' id="dr_number">
-      @endif
-    </div>
-
-    <label>Customer:</label>
-    <div class="input-group">
-      @if($has_customer)
-      <input tabindex="-1" type="text" class="form-control" id="customer-add-cart" name="Customer" placeholder="Type for Customer Name" autocomplete="off" value="{{$customer_data['customer_name']}}" disabled>
-      <span class="input-group-btn" id="customer-cart-btn">
-        <button class="btn btn-danger" type="button" id="customer-cart-remove-btn" data-balloon="Remove Customer" data-balloon-pos="up">&times;</button>
-      </span>
-      @else
-      <input tabindex="-1" type="text" class="form-control" id="customer-add-cart" name="Customer" placeholder="Type for Customer Name" value="" autocomplete="off">
-      <span class="input-group-btn" id="customer-cart-btn">
-        <button class="btn btn-success btn-add-customers" type="button">Add</button>
-      </span>
-      @endif
-    </div>
-
-    <label>Salesman:</label>
-    <div class="input-group">
-      @if($has_salesman)
-      <input type='text' id='salesman-add-cart' class='form-control' placeholder='Type for Salesman Name' value="{{$salesman_data['salesman_name']}}" disabled>
-      <span class="input-group-btn" id="salesman-cart-btn">
-        <button class="btn btn-danger" type="button" id="salesman-cart-remove-btn" data-balloon="Remove Customer" data-balloon-pos="up">&times;</button>
-      </span>
-      @else
-      <input type='text' id='salesman-add-cart' class='form-control' placeholder='Type for Salesman Name'>
-      <span class="input-group-btn" id="salesman-cart-btn">
-        <button class="btn btn-success btn-add-salesman" type="button">Add</button>
-      </span>
-      @endif
-    </div>
-
-    <div class="form-group">
-      <label>Type of Price:</label>
-      <select id='type_price' name="type_price" class='form-control'>
-        <option value='srp' {{ ($type_price=="srp"?'selected="selected"':false) }}>Suggested Retail Price</option>
-        <option value='price_to_distributors' {{ ($type_price=="price_to_distributors"?'selected="selected"':false) }}>Price to Distributors</option>
-      </select>
-    </div>
-
-    
-    <div class="form-group">
-      <label>Terms:</label>
-      <input type='number' min='0' name='term' value="{{$term}}" class='form-control' id='term' placeholder='Number of Days' value='0'>
-    </div>
-    <div class="form-group">
-      <label>Comments:</label>
-      <textarea name='comments' class='form-control' id="comments">{{$comments}}</textarea>
-    </div>
-    <div class="form-group">
-      <label>Sales Register:</label>
-      <button type="submit" class='btn btn-primary btn-block' form="sales_dr-form">
-        <span class='glyphicon glyphicon-floppy-disk'></span> Save & Continue
-      </button>
-      <button class='btn btn-danger btn-block' id='clear_items'>
-        <span class='glyphicon glyphicon-trash'></span> Clear All Items
-      </button>
-      <button class='btn btn-danger btn-block' id='clear_cart'>
-        <span class='glyphicon glyphicon-trash'></span> Clear Sales Cart
-      </button>
-    </div>
-
-    <div class="form-group">
-      <label>TS Number:</label>
-      <input type='text' class='form-control' id='search_ts' placeholder='TS Number' autocomplete='off' name='ts_orderID'>
-    </div>
-    <div class="form-group">
-      <label>Utilities:</label>
-      <button class='btn btn-info btn-block' id='reset_price'>
-        <span class='glyphicon glyphicon-refresh'></span> Reset All Prices
-      </button>
-      <button class='btn btn-info btn-block' id='reset_costprice'>
-        <span class='glyphicon glyphicon-refresh'></span> Reset All Cost Price
-      </button>
-    </div>
   </div>
 </div>
 
@@ -331,6 +332,15 @@ $(document).ready(function(e) {
     });
   });
 
+  $(document).on("keyup change","#dr_number",function(e) {
+    $.ajax({
+      type: "PUT",
+      url: "/sales/drcart",
+      data: "_token=<?php echo csrf_token(); ?>"+"&dr_number="+e.target.value,
+      cache: false
+    });
+  });
+
   $(document).on("keyup change","#comments",function(e) {
     $.ajax({
       type: "PUT",
@@ -429,8 +439,8 @@ $(document).ready(function(e) {
     });
   });
 
-  $(document).on("submit","#sales_dr-form",function(e) {
-    // e.preventDefault();
+  $(document).on("submit","#sales_dr-fosrm",function(e) {
+    e.preventDefault();
     $.ajax({
       type: "POST",
       url: $("#sales_dr-form").attr("action"),
@@ -474,7 +484,7 @@ $(document).ready(function(e) {
                 <td><input type="number" class="costprice" id="'+i+'" value="'+data.items[i].costprice+'"></td>\
                 <td><input type="number" class="quantity" id="'+i+'" value="'+data.items[i].quantity+'" max="'+data.items[i].remaining_quantity+'"></td>\
                 <td><input type="number" class="price" id="'+i+'" value="'+data.items[i].price+'"></td>\
-                <td style="text-align:right"><span class="line_total" id="'+i+'">'+data.items[i].line_sales_total+'</span></td>\
+                <td style="text-align:right"><span class="line_total" id="'+i+'">'+data.items[i].line_price_total+'</span></td>\
                 </tr>');
             }
           }

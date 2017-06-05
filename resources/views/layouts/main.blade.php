@@ -15,9 +15,8 @@
 <link rel="stylesheet" type="text/css" href="/assets/css/alertify-css/themes/default.min.css">
 <link rel="stylesheet" type="text/css" href="/assets/css/core.css">
 <link rel="stylesheet" type="text/css" href="/assets/jqueryui/jquery-ui.min.css">
-<style>
+
 @yield('css')
-</style>
 </head>
 <body>
 <nav class="navbar navbar-default nav-stacked">
@@ -33,29 +32,56 @@
     <div class="collapse navbar-collapse" id="pos-navbar">
     <ul class="nav navbar-nav">
       <li><a href="/">Home</a></li>
+
+      @if(isset($user_data)&&$user_data['items']==1)
       <li><a href="/items">Items</a></li>
+      @endif
+      @if(isset($user_data)&&$user_data['sales']==1)
       <li><a href="/sales">Sales</a></li>
+      @endif
+      @if(isset($user_data)&&$user_data['receiving']==1)
       <li><a href="/purchases">Purchases</a></li>
+      @endif
+      @if(isset($user_data)&&$user_data['credits']==1)
       <li><a href="/receivables">Receivables</a></li>
+      @endif
+      @if(isset($user_data)&&$user_data['expenses']==1)
       <li><a href="/expenses">Expenses</a></li>
+      @endif
+      @if(isset($user_data)&&$user_data['accounts_payable']==1)
       <li><a href="/payables">Payables</a></li>
+      @endif
     </ul>
     <ul class="nav navbar-nav navbar-right">
+    @if(isset($user_data)&&$user_data['reports']==1)
     <li><a href="/reports">Reports</a></li>
+    @endif
+    @if(isset($user_data))
     <li class="dropdown">
       <a class="dropdown-toggle" data-toggle="dropdown" href="#">
       <span class="caret"></span></a>
       <ul class="dropdown-menu">
+      @if(isset($user_data)&&$user_data['customers']==1)
         <li><a href="/customers">Customers</a></li>
+        @endif
+        @if(isset($user_data)&&$user_data['salesman']==1)
         <li><a href="/salesman">Salesman</a></li>
+        @endif
+        @if(isset($user_data)&&$user_data['suppliers']==1)
         <li><a href="/suppliers">Suppliers</a></li>
+        @endif
+        @if(isset($user_data)&&$user_data['users']==1)
         <li><a href="/users">Users</a></li>
+        @endif
 
-        <li><a href="#" id="app-settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
-        <li><a href="#" id="app-settings"><span class="glyphicon glyphicon-cog"></span> Maintenance</a></li>
-        <li><a href="#" id="app-settings"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+        <li><a href="/settings" id="app-settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+        <li><a href="/maintenance" id="app-settings"><span class="glyphicon glyphicon-cog"></span> Maintenance</a></li>
+        <li><a href="/logout" id="app-settings"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
       </ul>
     </li>
+    @else
+    <li><a href="/login" id="app-settings"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+    @endif
     </ul>
     </div>
   </div>
