@@ -292,6 +292,8 @@ class Sales_controller extends Controller
 
     public function dr(Request $request,$orderID)
     {
-      return view('salesdr_complete'); 
+      $users = new Users;
+      $data["user_data"] = $users->where("accountID",$request->session()->get('user'))->first();
+      return view('salesdr_complete',$data); 
     }
 }
