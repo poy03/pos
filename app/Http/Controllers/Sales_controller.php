@@ -14,6 +14,7 @@ use App\Salesman;
 use App\Items;
 use App\Users;
 use App\Items_history;
+use App\App_config;
 
 class Sales_controller extends Controller
 {
@@ -292,8 +293,31 @@ class Sales_controller extends Controller
 
     public function dr(Request $request,$orderID)
     {
+      // abort(404);
+      $item_data = new Items_controller;
+      $customer_data = new Customers_controller;
+      $salesman_data = new Salesman_controller;
+
+      $app = new App_config;
+      $data['app'] =  $app::find(1);
+
       $users = new Users;
       $data["user_data"] = $users->where("accountID",$request->session()->get('user'))->first();
+
+      $sales_dr = new Sales_dr;
+      $sales_dr = $sales_dr->where("orderID",$orderID)->first();
+      
+      $sales_dr_details = new Sales_dr_details;
+      $sales_dr->sales_dr_details = $sales_dr_details->where("orderID",$orderID)->get();
+
+      $sales_dr->customer_data = $customer_data->show($sales_dr->customerID);
+      $sales_dr->salesman_data = $salesman_data->show($sales_dr->salesmanID);
+
+      foreach ($sales_dr->sales_dr_details as $dr_item) {
+        $dr_item->item_data = $item_data->show($dr_item->itemID);
+      }
+      $data["sales_dr"] = $sales_dr;
+      // return $sales_dr;
       return view('salesdr_complete',$data); 
     }
 }

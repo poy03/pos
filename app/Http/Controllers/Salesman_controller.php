@@ -79,7 +79,11 @@ class Salesman_controller extends Controller
    public function show($salesmanID)
    {
     $salesman = new Salesman;
-    $data = $salesman->where('salesmanID',$salesmanID)->first();
+    $data = $salesman->where('salesmanID',$salesmanID);
+    if($data->count()==0){
+        return '';
+    }
+    $data = $data->first();
     $data->salesman_name = htmlspecialchars_decode($data->salesman_name);
     $data->salesman_address = htmlspecialchars_decode($data->salesman_address);
     $data->salesman_contact_number = htmlspecialchars_decode($data->salesman_contact_number);

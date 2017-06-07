@@ -81,7 +81,11 @@ class Suppliers_controller extends Controller
     public function show($supplierID)
     {
         $suppliers = new Suppliers;
-        $data = $suppliers->where('supplierID',$supplierID)->first();
+        $data = $suppliers->where('supplierID',$supplierID);
+        if($data->count()==0){
+            return '';
+        }
+        $data = $data->first();
         $data->supplier_name = htmlspecialchars_decode($data->supplier_name);
         $data->supplier_company = htmlspecialchars_decode($data->supplier_company);
         $data->supplier_number = htmlspecialchars_decode($data->supplier_number);

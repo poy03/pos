@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use DB;
 use App\Users;
+use App\App_config;
 
 class App_controller extends Controller
 {
@@ -14,6 +15,7 @@ class App_controller extends Controller
   {
     $users = new Users;
     $data["user_data"] = $users->where("accountID",$request->session()->get('user'))->first();
+    dd();
     return view('home',$data);
   }
 
@@ -43,8 +45,15 @@ class App_controller extends Controller
       'company_name' => 'required|max:100',
       'address' => 'required|max:100',
       'contact_number' => 'required|max:100',
-      'logo' => 'max:500|image',
+      // 'logo' => 'max:500|image',
     ]);
-
+    $app = new App_config;
+    $app = $app->where('id', 1)
+    ->update(
+      [
+        'app_company_name'=>$request->company_name,
+        'address'=>$request->address,
+        'contact_number'=>$request->contact_number
+      ]);
   }
 }

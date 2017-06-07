@@ -93,7 +93,19 @@ class Customers_controller extends Controller
     public function show($customerID)
     {
         $customers = new Customers;
-        $data = $customers->where('customerID',$customerID)->first();
+        $data = $customers->where('customerID',$customerID);
+        if($data->count()==0){
+            $data = [
+                'companyname' => '',
+                'address' => '',
+                'email' => '',
+                'phone' => '',
+                'contactperson' => '',
+                'tin_id' => '',
+            ];
+            return $data;
+        }
+        $data = $data->first();
         $data->companyname = htmlspecialchars_decode($data->companyname);
         $data->address = htmlspecialchars_decode($data->address);
         $data->email = htmlspecialchars_decode($data->email);

@@ -132,7 +132,16 @@ class Items_controller extends Controller
     public function show($itemID)
     {
         $items = new Items;
-        $data = $items->where("itemID",$itemID)->first();
+        $data = $items->where("itemID",$itemID);
+        if($data->count()==0){
+            $data = [
+                'category' => '',
+                'itemname' => '',
+                'item_code' => '',
+            ];
+            return $data;
+        }
+        $data = $data->first();
         $data->category = htmlspecialchars_decode($data->category);
         $data->itemname = htmlspecialchars_decode($data->itemname);
         $data->item_code = htmlspecialchars_decode($data->item_code);
