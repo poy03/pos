@@ -15,43 +15,9 @@
 	overflow: auto;
 }
 
-#sms-modal .modal-body{
-	min-height: 20em;
-}
-
 .modal-title{
 	text-transform: uppercase;
 }
-
-#login-logo{
-	height: 10rem;
-	margin-left: auto;
-	margin-right: auto;
-	padding-bottom: 1rem;
-}
-
-body#has-logo{
-    background: url("../../logo-high.jpg");
-    /*background: url("../../logo-high.png");*/
-    background-color: white;
-    background-size: 70vw;
-    background-repeat:no-repeat;
-    background-attachment: fixed;
-    background-position: center;
-
-}
-
-.recipient{
-	text-transform: capitalize;
-}
-#display-photo{
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
-	height: inherit;
-	width: inherit;
-}
-
 .ui-datepicker{
     z-index: 20000 !important;
 }
@@ -98,5 +64,11 @@ body#has-logo{
     }
     .collapsing {
         overflow: hidden!important;
+    }
+}
+
+@media print {
+    .printhide{
+        display:none; 
     }
 }

@@ -439,21 +439,25 @@ $(document).ready(function(e) {
     });
   });
 
-  $(document).on("submit","#sales_dr-fosrm",function(e) {
+  $(document).on("submit","#sales_dr-form",function(e) {
     e.preventDefault();
     $.ajax({
       type: "POST",
       url: $("#sales_dr-form").attr("action"),
       data: $("#sales_dr-form").serialize(),
       cache: false,
+      dataType: "json",
       beforeSend: function(){
         $('button[form="sales_dr-form"]').prop("disabled",true);
       },
       success: function(data){
-        console.log(data)
+        window.location = "sales/dr/"+data.dr;
       },
-      error: function(e) {
-        
+      error: function(data) {
+        if(data.status = 422){
+          var errors = data.responseJSON;
+          alertify.error(errors.error);
+        }
       },
       complete: function() {
         $('button[form="sales_dr-form"]').prop("disabled",false);

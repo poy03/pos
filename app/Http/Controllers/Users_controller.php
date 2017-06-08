@@ -82,7 +82,11 @@ class Users_controller extends Controller
     public function show($accountID)
     {
         $users = new Users;
-        $data = $users->where('accountID',$accountID)->first();
+        $data = $users->where('accountID',$accountID);
+        if($data->count()==0){
+            abort(404);
+        }
+        $data = $data->first();
         $data->username = $data->username;
         $data->employee_name = htmlspecialchars_decode($data->employee_name);
         return $data;

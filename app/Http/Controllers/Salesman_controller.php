@@ -81,7 +81,7 @@ class Salesman_controller extends Controller
     $salesman = new Salesman;
     $data = $salesman->where('salesmanID',$salesmanID);
     if($data->count()==0){
-        return '';
+      abort(404);
     }
     $data = $data->first();
     $data->salesman_name = htmlspecialchars_decode($data->salesman_name);

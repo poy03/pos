@@ -83,7 +83,7 @@ class Suppliers_controller extends Controller
         $suppliers = new Suppliers;
         $data = $suppliers->where('supplierID',$supplierID);
         if($data->count()==0){
-            return '';
+            abort(404);
         }
         $data = $data->first();
         $data->supplier_name = htmlspecialchars_decode($data->supplier_name);

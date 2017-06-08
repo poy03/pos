@@ -270,7 +270,6 @@ $(document).ready(function() {
       },
       error: function(data) {
         console.log(data);
-        alertify.error(data.responseText);
         if(data.status = 422){
           var errors = data.responseJSON;
           $("#edit-category-help-block").html(errors.category);

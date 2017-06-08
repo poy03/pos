@@ -15,7 +15,6 @@ class App_controller extends Controller
   {
     $users = new Users;
     $data["user_data"] = $users->where("accountID",$request->session()->get('user'))->first();
-    dd();
     return view('home',$data);
   }
 

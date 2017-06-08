@@ -134,12 +134,7 @@ class Items_controller extends Controller
         $items = new Items;
         $data = $items->where("itemID",$itemID);
         if($data->count()==0){
-            $data = [
-                'category' => '',
-                'itemname' => '',
-                'item_code' => '',
-            ];
-            return $data;
+            abort(404);
         }
         $data = $data->first();
         $data->category = htmlspecialchars_decode($data->category);

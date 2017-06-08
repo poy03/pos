@@ -95,15 +95,7 @@ class Customers_controller extends Controller
         $customers = new Customers;
         $data = $customers->where('customerID',$customerID);
         if($data->count()==0){
-            $data = [
-                'companyname' => '',
-                'address' => '',
-                'email' => '',
-                'phone' => '',
-                'contactperson' => '',
-                'tin_id' => '',
-            ];
-            return $data;
+            abort(404);
         }
         $data = $data->first();
         $data->companyname = htmlspecialchars_decode($data->companyname);

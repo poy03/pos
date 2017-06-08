@@ -156,6 +156,9 @@ class Sales_controller extends Controller
           $cart_data["total_costprice"] = 0;
           foreach ($cart_data["items"] as $key => $cart_data_item) {
             $item_data = $items->where("itemID",$key)->first();
+            if($item_data->deleted==1){
+              continue;
+            }
             $cart_data["items"][$key]["itemname"] = $item_data->itemname;
             $cart_data["items"][$key]["item_code"] = $item_data->item_code;
             $cart_data["items"][$key]["remaining_quantity"] = $item_data->quantity;
@@ -201,7 +204,7 @@ class Sales_controller extends Controller
       }elseif ($request->type&&$request->type=="customers") {
         $request->session()->forget('sales_dr.customer_data');
       }elseif ($request->type&&$request->type=="salesman") {
-        $request->session()->forget('sales_dr.salesmanr_data');
+        $request->session()->forget('sales_dr.salesman_data');
       }elseif ($request->type&&$request->type=="cart") {
         $request->session()->forget('sales_dr');
       }
@@ -217,10 +220,12 @@ class Sales_controller extends Controller
           $item_data = $items->where("itemID",$itemID)->where("deleted",0)->first();
           if($item_data==NULL){
             $valid_items = FALSE;
+            $data["error"] = "An item in the cart has been deleted. Please check the items in the sales cart or try Refreshing the page.";
             break;
           }
           if($item_data->quantity < $item_cart["quantity"]){
               $valid_items = FALSE;
+              $data["error"] = "Invalid quantity. Please check the remaining quantity of the items.";
               break;
           }
           if(!$valid_items){
@@ -228,7 +233,6 @@ class Sales_controller extends Controller
           }
         }
         if(!$valid_items){
-          $data["error"] = "Some errors has occured. Try Refreshing the page.";
           return response($data, 422);
         }
       }else{
@@ -242,6 +246,7 @@ class Sales_controller extends Controller
         $sales_dr->orderID = $cart_data["dr_number"];
       }
       $sales_dr->date_ordered = strtotime(date("m/d/Y"));
+      $sales_dr->date_delivered = strtotime(date("m/d/Y"));
       $sales_dr->time_ordered = strtotime(date("m/d/Y h:i:s A"));
       $sales_dr->total = $cart_data["total_sales_int"];
       $sales_dr->customer = (isset($cart_data["customer_data"])?$cart_data["customer_data"]["customer_name"]:($request->customer?$request->customer:""));
@@ -289,14 +294,18 @@ class Sales_controller extends Controller
         $history->date_time = strtotime(date("m/d/Y"));
         $history->save();
       }
+      $data["dr"] = $dr_data->orderID;
+      return $data;
+
     }
 
     public function dr(Request $request,$orderID)
     {
       // abort(404);
-      $item_data = new Items_controller;
-      $customer_data = new Customers_controller;
-      $salesman_data = new Salesman_controller;
+      $customers = new Customers;
+      $items = new Items;
+      $salesman = new Salesman;
+
 
       $app = new App_config;
       $data['app'] =  $app::find(1);
@@ -310,14 +319,35 @@ class Sales_controller extends Controller
       $sales_dr_details = new Sales_dr_details;
       $sales_dr->sales_dr_details = $sales_dr_details->where("orderID",$orderID)->get();
 
-      $sales_dr->customer_data = $customer_data->show($sales_dr->customerID);
-      $sales_dr->salesman_data = $salesman_data->show($sales_dr->salesmanID);
+      if($sales_dr->customer != "" && $sales_dr->customerID != 0){
+        $sales_dr->customer = $customers->where("customerID",$sales_dr->customerID)->first()->value("companyname");
+        $sales_dr->address = $customers->where("customerID",$sales_dr->customerID)->first()->value("address");
+      }else{
+        $sales_dr->address = "";
+      }
+
+      if($sales_dr->salesmanID != 0){
+        $sales_dr->salesman_name = $salesman->where("salesmanID",$sales_dr->salesmanID)->first()->value("salesman_name");
+      }else{
+        $sales_dr->salesman_name = "";
+      }
+
 
       foreach ($sales_dr->sales_dr_details as $dr_item) {
-        $dr_item->item_data = $item_data->show($dr_item->itemID);
+        $dr_item->itemname = $items->where("itemID",$dr_item->itemID)->first()->value("itemname");
+        $dr_item->item_code = $items->where("itemID",$dr_item->itemID)->first()->value("item_code");
+        $dr_item->unit_of_measure = $items->where("itemID",$dr_item->itemID)->first()->value("unit_of_measure");
       }
       $data["sales_dr"] = $sales_dr;
       // return $sales_dr;
       return view('salesdr_complete',$data); 
+    }
+
+    public function dr_updateinfo(Request $request,$orderID)
+    {
+      $sales_dr = new Sales_dr;
+      $sales_dr->where("orderID",$orderID)->update([
+        $request->type => ( $request->type=="date_delivered" ? strtotime($request->value):trim(htmlspecialchars($request->value)) )
+        ]);
     }
 }
