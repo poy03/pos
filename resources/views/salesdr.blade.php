@@ -178,8 +178,10 @@ $(document).ready(function(e) {
           cache: false,
           dataType: "json",
           success: function(data) {
+            console.log(data);
             $("#customer-add-cart").prop("disabled",true);
             $("#customer-cart-btn").html('<button class="btn btn-danger" type="button" id="customer-cart-remove-btn" data-balloon="Remove Customer" data-balloon-pos="up">&times;</button>');
+            $("#term").val(data.term);
           }
         });
       }
@@ -208,10 +210,11 @@ $(document).ready(function(e) {
       url: "/sales/drcart",
       data: "_token=<?php echo csrf_token(); ?>"+"&type=customers",
       cache: false,
-      success: function(data) {
-        $("#customer-add-cart").prop("disabled",false);
-        $("#customer-add-cart").val("");
+      complete: function() {
         $("#customer-cart-btn").html('<button class="btn btn-success btn-add-customers" type="button">Add</button>');
+        $("#customer-add-cart").val("");
+        $("#customer-add-cart").prop("disabled",false);
+        // body...
       }
     });
   });
@@ -222,7 +225,7 @@ $(document).ready(function(e) {
       url: "/sales/drcart",
       data: "_token=<?php echo csrf_token(); ?>"+"&type=salesman",
       cache: false,
-      success: function(data) {
+      complete: function(){
         $("#salesman-add-cart").prop("disabled",false);
         $("#salesman-add-cart").val("");
         $("#salesman-cart-btn").html('<button class="btn btn-success btn-add-customers" type="button">Add</button>');

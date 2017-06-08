@@ -88,6 +88,7 @@ class Sales_controller extends Controller
           "customerID" => $request->id,
           "customer_name" => $customer_data->companyname,
         ];
+        $data["term"] = $customer_data->term; 
         $request->session()->put('sales_dr', $data);
       }elseif ($request->type&&$request->type=="salesman") {
         $salesman = new Salesman; 
@@ -349,5 +350,10 @@ class Sales_controller extends Controller
       $sales_dr->where("orderID",$orderID)->update([
         $request->type => ( $request->type=="date_delivered" ? strtotime($request->value):trim(htmlspecialchars($request->value)) )
         ]);
+    }
+
+    public function dr_payment(Request $request,$type)
+    {
+      # code...
     }
 }

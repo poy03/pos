@@ -54,15 +54,13 @@
     <center style='font-size:12pt;text-align:center'>{{ $app->address }}</center>
     <center style='font-size:12pt;text-align:center;margin-bottom: 5pt;'>TEL. <i class='fa fa-phone' aria-hidden='true'></i> {{ $app->contact_number }}</center>
     <div class='dr'>
-    
-    
     <table style='width:100%'>
       <tr>
         <th colspan='20'>DELIVERY RECEIPT<img src='logo.png' style='height:50px;position:absolute;right:0;padding-right:25px'></th>
       </tr>
 
       <tr>
-        <th>No {{ $sales_dr->orderID }}</th>
+        <th>No <span id="orderID">{{ $sales_dr->orderID }}</span></th>
         <th></th>
         <th>TS-0000-00-000</th>
       </tr>
@@ -103,7 +101,7 @@
       </tr>
       <tr>
         <th style='border-width:0px'>Delivery Date</th>
-        <th style='border-right-width:0px;border-top-width:0px;border-left-width:0px;'><input type='text' class='date_delivered update_dr' id="{{ $sales_dr->orderID }}" title="date_delivered" value="{{ date('m/d/Y',$sales_dr->date_delivered) }}" style='width:100%' readonly></th>
+        <th style='border-right-width:0px;border-top-width:0px;border-left-width:0px;'><input type='text' class='update_dr' id="date_delivered" value="{{ date('m/d/Y',$sales_dr->date_delivered) }}" style='width:100%' readonly></th>
       </tr>
       <tr>
         <th style='border-width:0px'>&nbsp;<br>Order Details</th>
@@ -174,9 +172,9 @@
         <th style="width:20%">Received By:</th>
       </tr>
       <tr>
-        <td style="border-bottom-width:2px;border-bottom-color:black;border-bottom-style:solid;"><input type="text" class="update_dr" id="{{ $sales_dr->orderID }}" title="prepared_by" style="width:100%;text-align:center" value="{{ htmlspecialchars_decode($sales_dr->prepared_by) }}"></td>
+        <td style="border-bottom-width:2px;border-bottom-color:black;border-bottom-style:solid;"><input type="text" class="update_dr" id="prepared_by" style="width:100%;text-align:center" value="{{ htmlspecialchars_decode($sales_dr->prepared_by) }}"></td>
         <td>&nbsp;</td>
-        <td style="border-bottom-width:2px;border-bottom-color:black;border-bottom-style:solid;"><input type="text" class="update_dr" id="{{ $sales_dr->orderID }}" title="received_by" style="width:100%;text-align:center" value="{{ htmlspecialchars_decode($sales_dr->received_by) }}"></td>
+        <td style="border-bottom-width:2px;border-bottom-color:black;border-bottom-style:solid;"><input type="text" class="update_dr" id="received_by" style="width:100%;text-align:center" value="{{ htmlspecialchars_decode($sales_dr->received_by) }}"></td>
       </tr>
 
       <tr>
@@ -195,9 +193,9 @@
         <th>Delivered By:</th>
       </tr>
       <tr>
-        <td style="border-bottom-width:2px;border-bottom-color:black;border-bottom-style:solid;"><input type="text" class="update_dr" id="{{ $sales_dr->orderID }}" title="released_by" style="width:100%;text-align:center" value="{{ htmlspecialchars_decode($sales_dr->released_by) }}"></td>
+        <td style="border-bottom-width:2px;border-bottom-color:black;border-bottom-style:solid;"><input type="text" class="update_dr" id="released_by" style="width:100%;text-align:center" value="{{ htmlspecialchars_decode($sales_dr->released_by) }}"></td>
         <td>&nbsp;</td>
-        <td style="border-bottom-width:2px;border-bottom-color:black;border-bottom-style:solid;"><input type="text" class="update_dr" id="{{ $sales_dr->orderID }}" title="delivered_by" style="width:100%;text-align:center" value="{{ htmlspecialchars_decode($sales_dr->delivered_by) }}"></td>
+        <td style="border-bottom-width:2px;border-bottom-color:black;border-bottom-style:solid;"><input type="text" class="update_dr" id="delivered_by" style="width:100%;text-align:center" value="{{ htmlspecialchars_decode($sales_dr->delivered_by) }}"></td>
       </tr>
       <tr>
         <th>&nbsp;</th>
@@ -215,7 +213,7 @@
         <th></th>
       </tr>
       <tr>
-        <td style="border-bottom-width:2px;border-bottom-color:black;border-bottom-style:solid;"><input type="text" class="update_dr" id="{{ $sales_dr->orderID }}" title="approved_by" style="width:100%;text-align:center" value="{{ htmlspecialchars_decode($sales_dr->approved_by) }}"></td>
+        <td style="border-bottom-width:2px;border-bottom-color:black;border-bottom-style:solid;"><input type="text" class="update_dr" id="approved_by" style="width:100%;text-align:center" value="{{ htmlspecialchars_decode($sales_dr->approved_by) }}"></td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
       </tr>
@@ -234,21 +232,20 @@
   </div>
   <div class="printhide">
       <div class="btn-group btn-group-lg" role="group">
-        <button type="button" class="btn btn-danger">
-          <span class="glyphicon glyphicon-trash"></span>
-          Delete
+        <button type="button" class="btn btn-danger" id="dr-delete">
+          <span class="glyphicon glyphicon-trash"></span> Delete
         </button>
-        <button type="button" class="btn btn-info">
-          <span class="glyphicon glyphicon-print"></span>
-          Print
+        <button type="button" class="btn btn-info" id="dr-print">
+          <span class="glyphicon glyphicon-print"></span> Print
         </button>
-        <button type="button" class="btn btn-success">
-          <span class="glyphicon glyphicon-shopping-cart"></span>
-          Payments
+        <button type="button" class="btn btn-success" id="dr-paycash" onclick="$('#cash-payment-modal').modal('show')">
+          <span class="glyphicon glyphicon-shopping-cart"></span> Cash Payment
         </button>
-        <button type="button" class="btn btn-primary">
-          <span class="glyphicon glyphicon-edit"></span>
-          Return Items
+        <button type="button" class="btn btn-success" id="dr-paypdc">
+          <span class="glyphicon glyphicon-calendar"></span> PDC Payment
+        </button>
+        <button type="button" class="btn btn-primary" id="dr-itemreturn">
+          <span class="glyphicon glyphicon-edit"></span> Return Items
         </button>
       </div>
   </div>
@@ -258,17 +255,73 @@
 
 @section('modals')
 
+<!--Cash Payment Modal -->
+<div id="cash-payment-modal" class="modal fade" role="dialog" tabindex="-1">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h4 class="modal-title">Cash Payment</h4>
+    </div>
+      <div class="modal-body">
+        <form action="/sales/payment" method="post" class="form" id="cash-payment-form">
+          {{ csrf_field() }}
+          <input type="hidden" name="type" value="cash">
+          <div class='form-group'>
+            <label for="total">Total:</label>
+            <input type='text' class='form-control' value="{{ number_format($sales_dr->balance,2) }}" readonly>
+          </div>
+
+          <div class='form-group'>
+            <label for="amount">Amount:</label>
+            <input type='text' class='form-control' id="amount" name="amount" placeholder='Amount' autocomplete='off'>
+            <p class="help-block" id="amount-help-block"></p>
+          </div>
+
+          <div class='form-group'>
+            <label for="ar_number">AR Number:</label>
+            <input type='text' class='form-control' id="ar_number" name="ar_number" placeholder='AR Number' autocomplete='off'>
+            <p class="help-block" id="ar_number-help-block"></p>
+          </div>
+
+          <div class='form-group'>
+            <label for="date_payment">Date Payment:</label>
+            <input type='text' class='form-control' id="date_payment" name="date_payment" placeholder='Date Payment' value="{{ date('m/d/Y') }}" readonly>
+            <p class="help-block" id="date_payment-help-block"></p>
+          </div>
+
+          <div class='form-group'>
+            <label for="change">Change:</label>
+            <input type='text' class='form-control' id="change" placeholder='Change' value="{{ number_format(0,2) }}" readonly>
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary" form="cash-payment-form">Confirm</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
 @endsection
 
 @section('scripts')
 <script type="text/javascript">
 $(document).ready(function(e) {
-  $(".date_delivered").datepicker();
+  var orderID = {{ $sales_dr->orderID }};
+  $("#date_delivered,#date_payment").datepicker();
   $(document).on("change keyup",".update_dr",function(e) {
     $.ajax({
       type: "PUT",
-      url: "/sales/dr/"+e.target.id,
-      data: "_token=<?php echo csrf_token(); ?>"+"&type="+e.target.title+"&value="+e.target.value,
+      url: "/sales/dr/"+orderID,
+      data: "_token=<?php echo csrf_token(); ?>"+"&type="+e.target.id+"&value="+e.target.value,
       cache: false
     });
   });
