@@ -271,12 +271,12 @@
           <input type="hidden" name="type" value="cash">
           <div class='form-group'>
             <label for="total">Total:</label>
-            <input type='text' class='form-control' value="{{ number_format($sales_dr->balance,2) }}" readonly>
+            <input type='text' class='form-control' value="{{ number_format($sales_dr->balance,2) }}" value="@{{total|currency:""}}" readonly>
           </div>
 
           <div class='form-group'>
             <label for="amount">Amount:</label>
-            <input type='text' class='form-control' id="amount" name="amount" placeholder='Amount' autocomplete='off'>
+            <input type='number' step="0.01" class='form-control' id="amount" name="amount" placeholder='Amount' ng-model="amount" autocomplete='off'>
             <p class="help-block" id="amount-help-block"></p>
           </div>
 
@@ -294,7 +294,7 @@
 
           <div class='form-group'>
             <label for="change">Change:</label>
-            <input type='text' class='form-control' id="change" placeholder='Change' value="{{ number_format(0,2) }}" readonly>
+            <input type='text' class='form-control' id="change" placeholder="Change" value="@{{change()|currency:''}}" readonly>
           </div>
 
         </form>
@@ -325,6 +325,20 @@ $(document).ready(function(e) {
       cache: false
     });
   });
+});
+
+
+var app = angular.module('pos', []);
+app.controller('maincontroller', function($scope) {
+    $scope.total = {{$sales_dr->balance,2}};
+    $scope.amount;
+    $scope.change = function() {
+      var change = $scope.amount-$scope.total;
+      if(change<=0){
+        change = 0;
+      }
+      return change;
+    };
 });
 </script>
 @endsection
