@@ -187,12 +187,31 @@ app.controller('maincontroller', function($scope, $http) {
     }).then(function mySuccess(response) {
       angular.forEach(response.data.items, function(value, key){
           $scope.items[key].line_price_total = value.price * value.quantity;
-        });
+      });
       $scope.total_sales = response.data.total_sales;
     }, function myError(response) {
         console.log(response.statusText);
     });
   }
+
+  /*
+
+$http({
+    method: 'DELETE',
+    url: '/roles/' + roleid,
+    data: {
+        user: userId
+    },
+    headers: {
+        'Content-type': 'application/json;charset=utf-8'
+    }
+})
+.then(function(response) {
+    console.log(response.data);
+}, function(rejection) {
+    console.log(rejection.data);
+});
+  */
 
   $("#item-add-cart").autocomplete({
       source: '/search/items/sales',
