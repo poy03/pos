@@ -160,6 +160,7 @@ class Sales_controller extends Controller
             if($item_data->deleted==1){
               continue;
             }
+            $cart_data["items"][$key]["id"] = $key;
             $cart_data["items"][$key]["itemname"] = $item_data->itemname;
             $cart_data["items"][$key]["item_code"] = $item_data->item_code;
             $cart_data["items"][$key]["remaining_quantity"] = $item_data->quantity;
@@ -171,20 +172,20 @@ class Sales_controller extends Controller
             }
             $cart_data["items"][$key]["line_price_total"] = $cart_data["items"][$key]["price"]*$cart_data["items"][$key]["quantity"];
             $cart_data["items"][$key]["line_price_total_int"] = $cart_data["items"][$key]["line_price_total"];
-            $cart_data["items"][$key]["line_price_total"] = number_format($cart_data["items"][$key]["line_price_total"],2);
+            $cart_data["items"][$key]["line_price_total"] = $cart_data["items"][$key]["line_price_total"];
             $cart_data["total_sales"] += $cart_data["items"][$key]["line_price_total_int"];
             
             $cart_data["items"][$key]["line_costprice_total"] = $cart_data["items"][$key]["costprice"]*$cart_data["items"][$key]["quantity"];
             $cart_data["items"][$key]["line_costprice_total_int"] = $cart_data["items"][$key]["line_costprice_total"];
-            $cart_data["items"][$key]["line_costprice_total"] = number_format($cart_data["items"][$key]["line_costprice_total"],2);
+            $cart_data["items"][$key]["line_costprice_total"] = $cart_data["items"][$key]["line_costprice_total"];
             $cart_data["total_costprice"] += $cart_data["items"][$key]["line_costprice_total_int"];
 
           }
           $cart_data["total_sales_int"] = $cart_data["total_sales"];
-          $cart_data["total_sales"] = number_format($cart_data["total_sales"],2);
+          $cart_data["total_sales"] = $cart_data["total_sales"];
 
           $cart_data["total_costprice_int"] = $cart_data["total_costprice"];
-          $cart_data["total_costprice"] = number_format($cart_data["total_costprice"],2);
+          $cart_data["total_costprice"] = $cart_data["total_costprice"];
         }
       return $cart_data;
     }
@@ -356,4 +357,14 @@ class Sales_controller extends Controller
     {
       # code...
     }
+
+    /*
+
+https://www.google.com.ph/search?q=I+Wait+For+The+Moment+That+You+Love+Me&oq=I+Wait+For+The+Moment+That+You+Love+Me&aqs=chrome..69i57.409j0j1&sourceid=chrome&ie=UTF-8
+
+https://myanimelist.net/anime/28725/Kokoro_ga_Sakebitagatterunda
+
+https://www.google.com.ph/search?q=Closely+linked+to+the+stars+anime&oq=Closely+linked+to+the+stars+anime&aqs=chrome..69i57.1915j0j1&sourceid=chrome&ie=UTF-8#q=Kuttsukiboshi
+
+    */
 }

@@ -40,10 +40,22 @@
               </tr>
             </thead>
             <tbody>
-
+              <tr ng-repeat="item_data in items">
+                <td><a class="delete_cart_item" id="@{{item_data.id}}" href="#">&times</a></td>
+                <td ng-bind="item_data.itemname"></td>
+                <td ng-bind="item_data.item_code"></td>
+                <td>@{{ item_data.remaining_quantity|number }}</td>
+                <td><input type="number" step="0.01" class="costprice" id="@{{item_data.id}}" ng-model="item_data.costprice"></td>
+                <td><input type="number" class="quantity" id="@{{item_data.id}}" max="@{{item_data.remaining_quantity}}" ng-model="item_data.quantity"></td>
+                <td><input type="number" step="0.01" class="price" id="@{{item_data.id}}" ng-model="item_data.price"></td>
+                <td style="text-align:right"><span class="line_total" id="@{{item_data.id}}">@{{item_data.line_price_total| currency:''}}</span></td>
+              </tr>
             </tbody>
             <tfoot>
-
+              <tr>
+                <th colspan="7" style="text-align:right">Total:</th>
+                <th style="text-align:right"><span>@{{ total_sales|currency:'' }}</span></th>
+              </tr>
             </tfoot>
           </table>
         </div>
@@ -150,7 +162,38 @@
 
 @section('scripts')
 <script type="text/javascript">
-$(document).ready(function(e) {
+
+var app = angular.module('pos', []);
+app.controller('maincontroller', function($scope, $http) {
+
+  show_cart();
+  function show_cart() {
+    $http({
+        method : "GET",
+        url : "/sales/drcart",
+    }).then(function mySuccess(response) {
+        $scope.items = response.data.items;
+        $scope.total_sales = response.data.total_sales;
+    }, function myError(response) {
+        console.log(response.statusText);
+    });
+  }
+
+  
+  function show_cart_total() {
+    $http({
+        method : "GET",
+        url : "/sales/drcart",
+    }).then(function mySuccess(response) {
+      angular.forEach(response.data.items, function(value, key){
+          $scope.items[key].line_price_total = value.price * value.quantity;
+        });
+      $scope.total_sales = response.data.total_sales;
+    }, function myError(response) {
+        console.log(response.statusText);
+    });
+  }
+
   $("#item-add-cart").autocomplete({
       source: '/search/items/sales',
       select: function(event, ui){
@@ -178,7 +221,6 @@ $(document).ready(function(e) {
           cache: false,
           dataType: "json",
           success: function(data) {
-            console.log(data);
             $("#customer-add-cart").prop("disabled",true);
             $("#customer-cart-btn").html('<button class="btn btn-danger" type="button" id="customer-cart-remove-btn" data-balloon="Remove Customer" data-balloon-pos="up">&times;</button>');
             $("#term").val(data.term);
@@ -244,15 +286,7 @@ $(document).ready(function(e) {
 
       },
       success: function(data) {
-        $.ajax({
-          url: "/sales/drcart",
-          cache: false,
-          dataType: "json",
-          success: function(data) {
-            $("#"+id+".line_total").html(data.items[id].line_total);
-            $("#total").html(data.total);
-          }
-        });
+        show_cart_total();
       },
       complete: function() {
 
@@ -271,15 +305,7 @@ $(document).ready(function(e) {
 
       },
       success: function(data) {
-        $.ajax({
-          url: "/sales/drcart",
-          cache: false,
-          dataType: "json",
-          success: function(data) {
-            $("#"+id+".line_total").html(data.items[id].line_total);
-            $("#total").html(data.total);
-          }
-        });
+        show_cart_total();
       },
       complete: function() {
        
@@ -467,42 +493,6 @@ $(document).ready(function(e) {
       }
     });
   })
-
-  show_cart();
-  function show_cart() {
-    var selector = "#dr-table";
-    $.ajax({
-      url: "/sales/drcart",
-      cache: false,
-      dataType: "json",
-      beforeSend: function() {
-        $(selector+" tbody").html("");
-        $(selector+" tfoot").html("");
-      },
-      success: function(data) {
-        if(typeof data.items != "undefined" && data.items.length != 0){
-          for (var i in data.items) {
-            if (data.items.hasOwnProperty(i)) {
-              $(selector+" tbody").append('<tr>\
-                <td><a class="delete_cart_item" id="'+i+'" href="#">&times</a></td>\
-                <td>'+data.items[i].itemname+'</td>\
-                <td>'+data.items[i].item_code+'</td>\
-                <td>'+data.items[i].remaining_quantity+'</td>\
-                <td><input type="number" class="costprice" id="'+i+'" value="'+data.items[i].costprice+'"></td>\
-                <td><input type="number" class="quantity" id="'+i+'" value="'+data.items[i].quantity+'" max="'+data.items[i].remaining_quantity+'"></td>\
-                <td><input type="number" class="price" id="'+i+'" value="'+data.items[i].price+'"></td>\
-                <td style="text-align:right"><span class="line_total" id="'+i+'">'+data.items[i].line_price_total+'</span></td>\
-                </tr>');
-            }
-          }
-          $(selector+" tfoot").html('<tr>\
-            <th colspan="7" style="text-align:right">Total:</th>\
-            <th style="text-align:right"><span id="total">'+data.total_sales+'</span></th>\
-            </tr>'); 
-        }
-      }
-    });
-  }
 });
 </script>
 @endsection
