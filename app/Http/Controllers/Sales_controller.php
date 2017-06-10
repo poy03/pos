@@ -254,6 +254,8 @@ class Sales_controller extends Controller
       $sales_dr->customer = (isset($cart_data["customer_data"])?$cart_data["customer_data"]["customer_name"]:($request->customer?$request->customer:""));
       $sales_dr->balance = $cart_data["total_sales_int"];
       $sales_dr->costprice = $cart_data["total_costprice_int"];
+      $sales_dr->type_payment = "credit";
+      $sales_dr->terms = $cart_data["term"];
       $sales_dr->comments = (isset($cart_data["comments"])?$cart_data["comments"]:"");
       $sales_dr->date_due = strtotime(date("m/d/Y")." + ".($cart_data["term"]==""?0:$cart_data["term"])." days");
       $sales_dr->overdue_date_1 = strtotime(date("m/d/Y", $sales_dr->date_due) . " +30 days");
@@ -355,7 +357,16 @@ class Sales_controller extends Controller
 
     public function dr_payment(Request $request,$type)
     {
-      # code...
+      $payments = new Payments;
+      if($type=="cash"){
+        $this->validate($request, [
+          'ar_number' => 'image',
+          'amount' => 'required',
+          'date_payment' => 'required|date',
+          // 'logo' => 'max:500|image',
+        ]);
+      }
+      return $request->ar_number;
     }
 
     /*

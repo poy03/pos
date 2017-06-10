@@ -4,153 +4,155 @@
 
 
 @section('content')
-<div class='col-sm-12'>
-  <div class='col-sm-10'>
-    <div class="row">
-      <div class='col-sm-6'>
-        <label>Add Item:</label>
-        <div class = "form-group">
-           <input type = "text" class = "form-control" name='itemname' id='item-add-cart' autocomplete='off' placeholder='Type for Item Name Or Item Code'>
-        </div>
-      </div>    
-      <div class='col-sm-6'>
-        <label>Add Item:</label>
-        <div class = "form-group">
-           <input type = "text" class = "form-control" name='itemname' id='itemsearch_cat' autocomplete='off' placeholder='Type for Category'>
+<div ng-app="pos" ng-controller="salescontroller" ng-cloak>
+  <div class='col-sm-12'>
+    <div class='col-sm-10'>
+      <div class="row">
+        <div class='col-sm-6'>
+          <label>Add Item:</label>
+          <div class = "form-group">
+             <input type = "text" class = "form-control" name='itemname' id='item-add-cart' autocomplete='off' placeholder='Type for Item Name Or Item Code'>
+          </div>
         </div>    
+        <div class='col-sm-6'>
+          <label>Add Item:</label>
+          <div class = "form-group">
+             <input type = "text" class = "form-control" name='itemname' id='itemsearch_cat' autocomplete='off' placeholder='Type for Category'>
+          </div>    
+        </div>
       </div>
-    </div>
 
 
-    <div class="row">
-      <div class="col-sm-12">
-        <div class="table-responsive">
-          <table class='table table-hover' id="dr-table">
-            <thead>
-              <tr>
-                <th></th>
-                <th>Item Name</th>
-                <th>Item Code</th>
-                <th>Remaining</th>
-                <th>Cost Price</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th style='text-align:right'>Line Total</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="item_data in items">
-                <td><a class="delete_cart_item" id="@{{item_data.id}}" href="#">&times</a></td>
-                <td ng-bind="item_data.itemname"></td>
-                <td ng-bind="item_data.item_code"></td>
-                <td>@{{ item_data.remaining_quantity|number }}</td>
-                <td><input type="number" step="0.01" class="costprice" id="@{{item_data.id}}" ng-model="item_data.costprice"></td>
-                <td><input type="number" class="quantity" id="@{{item_data.id}}" max="@{{item_data.remaining_quantity}}" ng-model="item_data.quantity"></td>
-                <td><input type="number" step="0.01" class="price" id="@{{item_data.id}}" ng-model="item_data.price"></td>
-                <td style="text-align:right"><span class="line_total" id="@{{item_data.id}}">@{{item_data.line_price_total| currency:''}}</span></td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <th colspan="7" style="text-align:right">Total:</th>
-                <th style="text-align:right"><span>@{{ total_sales|currency:'' }}</span></th>
-              </tr>
-            </tfoot>
-          </table>
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="table-responsive">
+            <table class='table table-hover' id="dr-table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Item Name</th>
+                  <th>Item Code</th>
+                  <th>Remaining</th>
+                  <th>Cost Price</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                  <th style='text-align:right'>Line Total</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="item_data in items">
+                  <td><a class="delete_cart_item" id="@{{item_data.id}}" href="#">&times</a></td>
+                  <td ng-bind="item_data.itemname"></td>
+                  <td ng-bind="item_data.item_code"></td>
+                  <td>@{{ item_data.remaining_quantity|number }}</td>
+                  <td><input type="number" step="0.01" class="costprice" id="@{{item_data.id}}" ng-model="item_data.costprice"></td>
+                  <td><input type="number" class="quantity" id="@{{item_data.id}}" max="@{{item_data.remaining_quantity}}" ng-model="item_data.quantity"></td>
+                  <td><input type="number" step="0.01" class="price" id="@{{item_data.id}}" ng-model="item_data.price"></td>
+                  <td style="text-align:right"><span class="line_total" id="@{{item_data.id}}">@{{item_data.line_price_total| currency:''}}</span></td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="7" style="text-align:right">Total:</th>
+                  <th style="text-align:right"><span>@{{ total_sales|currency:'' }}</span></th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
 
-  <div class='col-sm-2'>
-    <form action="/sales" method="post" id="sales_dr-form">
-    {{ csrf_field() }}
+    <div class='col-sm-2'>
+      <form action="/sales" method="post" id="sales_dr-form">
+      {{ csrf_field() }}
 
-      <div class="form-group">
-        <label>Delivery Receipt</label>
-        @if($has_dr)
-        <input type='number' class='form-control' name='dr_number' value="{{++$dr_data->orderID}}" disabled>
-        @else
-        <input type='number' class='form-control' name='dr_number' value="{{$dr_data["orderID"]}}" id="dr_number">
-        @endif
-      </div>
+        <div class="form-group">
+          <label>Delivery Receipt</label>
+          @if($has_dr)
+          <input type='number' class='form-control' name='dr_number' value="{{++$dr_data->orderID}}" disabled>
+          @else
+          <input type='number' class='form-control' name='dr_number' value="{{$dr_data["orderID"]}}" id="dr_number">
+          @endif
+        </div>
 
-      <label>Customer:</label>
-      <div class="input-group">
-        @if($has_customer)
-        <input tabindex="-1" type="text" class="form-control" name="customer" placeholder="Type for Customer Name" autocomplete="off" value="{{$customer_data['customer_name']}}" disabled>
-        <span class="input-group-btn" id="customer-cart-btn">
-          <button class="btn btn-danger" type="button" id="customer-cart-remove-btn" data-balloon="Remove Customer" data-balloon-pos="up">&times;</button>
-        </span>
-        @else
-        <input tabindex="-1" type="text" class="form-control" id="customer-add-cart" name="customer" placeholder="Type for Customer Name" value="" autocomplete="off">
-        <span class="input-group-btn" id="customer-cart-btn">
-          <button class="btn btn-success btn-add-customers" type="button">Add</button>
-        </span>
-        @endif
-      </div>
+        <label>Customer:</label>
+        <div class="input-group">
+          @if($has_customer)
+          <input tabindex="-1" type="text" class="form-control" name="customer" placeholder="Type for Customer Name" autocomplete="off" value="{{$customer_data['customer_name']}}" disabled>
+          <span class="input-group-btn" id="customer-cart-btn">
+            <button class="btn btn-danger" type="button" id="customer-cart-remove-btn" data-balloon="Remove Customer" data-balloon-pos="up">&times;</button>
+          </span>
+          @else
+          <input tabindex="-1" type="text" class="form-control" id="customer-add-cart" name="customer" placeholder="Type for Customer Name" value="" autocomplete="off">
+          <span class="input-group-btn" id="customer-cart-btn">
+            <button class="btn btn-success btn-add-customers" type="button">Add</button>
+          </span>
+          @endif
+        </div>
 
-      <label>Salesman:</label>
-      <div class="input-group">
-        @if($has_salesman)
-        <input type='text' id='salesman-add-cart' class='form-control' placeholder='Type for Salesman Name' value="{{$salesman_data['salesman_name']}}" disabled>
-        <span class="input-group-btn" id="salesman-cart-btn">
-          <button class="btn btn-danger" type="button" id="salesman-cart-remove-btn" data-balloon="Remove Customer" data-balloon-pos="up">&times;</button>
-        </span>
-        @else
-        <input type='text' id='salesman-add-cart' class='form-control' placeholder='Type for Salesman Name'>
-        <span class="input-group-btn" id="salesman-cart-btn">
-          <button class="btn btn-success btn-add-salesman" type="button">Add</button>
-        </span>
-        @endif
-      </div>
+        <label>Salesman:</label>
+        <div class="input-group">
+          @if($has_salesman)
+          <input type='text' id='salesman-add-cart' class='form-control' placeholder='Type for Salesman Name' value="{{$salesman_data['salesman_name']}}" disabled>
+          <span class="input-group-btn" id="salesman-cart-btn">
+            <button class="btn btn-danger" type="button" id="salesman-cart-remove-btn" data-balloon="Remove Customer" data-balloon-pos="up">&times;</button>
+          </span>
+          @else
+          <input type='text' id='salesman-add-cart' class='form-control' placeholder='Type for Salesman Name'>
+          <span class="input-group-btn" id="salesman-cart-btn">
+            <button class="btn btn-success btn-add-salesman" type="button">Add</button>
+          </span>
+          @endif
+        </div>
 
-      <div class="form-group">
-        <label>Type of Price:</label>
-        <select id='type_price' name="type_price" class='form-control'>
-          <option value='srp' {{ ($type_price=="srp"?'selected="selected"':false) }}>Suggested Retail Price</option>
-          <option value='price_to_distributors' {{ ($type_price=="price_to_distributors"?'selected="selected"':false) }}>Price to Distributors</option>
-        </select>
-      </div>
+        <div class="form-group">
+          <label>Type of Price:</label>
+          <select id='type_price' name="type_price" class='form-control'>
+            <option value='srp' {{ ($type_price=="srp"?'selected="selected"':false) }}>Suggested Retail Price</option>
+            <option value='price_to_distributors' {{ ($type_price=="price_to_distributors"?'selected="selected"':false) }}>Price to Distributors</option>
+          </select>
+        </div>
 
-      
-      <div class="form-group">
-        <label>Terms:</label>
-        <input type='number' min='0' name='term' value="{{$term}}" class='form-control' id='term' placeholder='Number of Days' value='0'>
-      </div>
-      <div class="form-group">
-        <label>Comments:</label>
-        <textarea name='comments' class='form-control' id="comments">{{$comments}}</textarea>
-      </div>
-      <div class="form-group">
-        <label>Sales Register:</label>
-        <button type="submit" class='btn btn-primary btn-block' form="sales_dr-form">
-          <span class='glyphicon glyphicon-floppy-disk'></span> Save & Continue
-        </button>
-        <button type="button" class='btn btn-danger btn-block' id='clear_items'>
-          <span class='glyphicon glyphicon-trash'></span> Clear All Items
-        </button>
-        <button type="button" class='btn btn-danger btn-block' id='clear_cart'>
-          <span class='glyphicon glyphicon-trash'></span> Clear Sales Cart
-        </button>
-      </div>
+        
+        <div class="form-group">
+          <label>Terms:</label>
+          <input type='number' min='0' name='term' value="{{$term}}" class='form-control' id='term' placeholder='Number of Days' value='0'>
+        </div>
+        <div class="form-group">
+          <label>Comments:</label>
+          <textarea name='comments' class='form-control' id="comments">{{$comments}}</textarea>
+        </div>
+        <div class="form-group">
+          <label>Sales Register:</label>
+          <button type="submit" class='btn btn-primary btn-block' form="sales_dr-form">
+            <span class='glyphicon glyphicon-floppy-disk'></span> Save & Continue
+          </button>
+          <button type="button" class='btn btn-danger btn-block' id='clear_items'>
+            <span class='glyphicon glyphicon-trash'></span> Clear All Items
+          </button>
+          <button type="button" class='btn btn-danger btn-block' id='clear_cart'>
+            <span class='glyphicon glyphicon-trash'></span> Clear Sales Cart
+          </button>
+        </div>
 
-      <div class="form-group">
-        <label>TS Number:</label>
-        <input type='text' class='form-control' id='search_ts' placeholder='TS Number' autocomplete='off' name='ts_orderID'>
-      </div>
-      <div class="form-group">
-        <label>Utilities:</label>
-        <button class='btn btn-info btn-block' id='reset_price'>
-          <span class='glyphicon glyphicon-refresh'></span> Reset All Prices
-        </button>
-        <button class='btn btn-info btn-block' id='reset_costprice'>
-          <span class='glyphicon glyphicon-refresh'></span> Reset All Cost Price
-        </button>
-      </div>
-    </form>
+        <div class="form-group">
+          <label>TS Number:</label>
+          <input type='text' class='form-control' id='search_ts' placeholder='TS Number' autocomplete='off' name='ts_orderID'>
+        </div>
+        <div class="form-group">
+          <label>Utilities:</label>
+          <button class='btn btn-info btn-block' id='reset_price'>
+            <span class='glyphicon glyphicon-refresh'></span> Reset All Prices
+          </button>
+          <button class='btn btn-info btn-block' id='reset_costprice'>
+            <span class='glyphicon glyphicon-refresh'></span> Reset All Cost Price
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -162,9 +164,8 @@
 
 @section('scripts')
 <script type="text/javascript">
-
 var app = angular.module('pos', []);
-app.controller('maincontroller', function($scope, $http) {
+app.controller('salescontroller', function($scope, $http) {
 
   show_cart();
   function show_cart() {
@@ -211,6 +212,20 @@ $http({
 }, function(rejection) {
     console.log(rejection.data);
 });
+
+
+var req = {
+ method: 'POST',
+ url: 'http://example.com',
+ headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+ data: { test: 'test' }
+}
+$http(req).then(function(data){
+  console.log(data);
+}, function(){
+
+});
+
   */
 
   $("#item-add-cart").autocomplete({
@@ -275,7 +290,6 @@ $http({
         $("#customer-cart-btn").html('<button class="btn btn-success btn-add-customers" type="button">Add</button>');
         $("#customer-add-cart").val("");
         $("#customer-add-cart").prop("disabled",false);
-        // body...
       }
     });
   });

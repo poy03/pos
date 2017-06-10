@@ -230,6 +230,7 @@ $(document).ready(function() {
         console.log(data);
         if(data.status = 422){
           var errors = data.responseJSON;
+          console.log(errors.category);
           $("#category-help-block").html(errors.category);
           $("#itemname-help-block").html(errors.itemname);
           $("#item_code-help-block").html(errors.item_code);

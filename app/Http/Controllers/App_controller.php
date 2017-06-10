@@ -55,4 +55,8 @@ class App_controller extends Controller
         'contact_number'=>$request->contact_number
       ]);
   }
+  public function test(Request $request)
+  {
+
+  }
 }

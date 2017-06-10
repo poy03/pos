@@ -254,9 +254,9 @@
 @endsection
 
 @section('modals')
-
+<div ng-app="modals">
 <!--Cash Payment Modal -->
-<div id="cash-payment-modal" class="modal fade" role="dialog" tabindex="-1">
+<div id="cash-payment-modal" class="modal fade" role="dialog" tabindex="-1" ng-controller="cashpayment_controller">
   <div class="modal-dialog">
 
     <!-- Modal content-->
@@ -266,30 +266,30 @@
       <h4 class="modal-title">Cash Payment</h4>
     </div>
       <div class="modal-body">
-        <form action="/sales/payment" method="post" class="form" id="cash-payment-form">
+        <form action="/sales/payment/cash" method="post" class="form" id="cash-payment-form">
           {{ csrf_field() }}
           <input type="hidden" name="type" value="cash">
           <div class='form-group'>
             <label for="total">Total:</label>
-            <input type='text' class='form-control' value="{{ number_format($sales_dr->balance,2) }}" value="@{{total|currency:""}}" readonly>
+            <input type='text' class='form-control' value="@{{total|currency:''}}" readonly>
           </div>
 
           <div class='form-group'>
             <label for="amount">Amount:</label>
-            <input type='number' step="0.01" class='form-control' id="amount" name="amount" placeholder='Amount' ng-model="amount" autocomplete='off'>
-            <p class="help-block" id="amount-help-block"></p>
+            <input type='number' step="0.01" class='form-control' id="amount" name="amount" placeholder='Amount' ng-model="formdata.amount" autocomplete='off'>
+            <p class="help-block" ng-show="formdata.amount_error" ng-bind="formdata.amount_error[0]"></p>
           </div>
 
           <div class='form-group'>
             <label for="ar_number">AR Number:</label>
-            <input type='text' class='form-control' id="ar_number" name="ar_number" placeholder='AR Number' autocomplete='off'>
-            <p class="help-block" id="ar_number-help-block"></p>
+            <input type='text' class='form-control' id="ar_number" name="ar_number" placeholder='AR Number' autocomplete='off' ng-model="formdata.ar_number">
+            <p class="help-block" ng-show="formdata.ar_number_error" ng-bind="formdata.ar_number_error[0]"></p>
           </div>
 
           <div class='form-group'>
             <label for="date_payment">Date Payment:</label>
-            <input type='text' class='form-control' id="date_payment" name="date_payment" placeholder='Date Payment' value="{{ date('m/d/Y') }}" readonly>
-            <p class="help-block" id="date_payment-help-block"></p>
+            <input type='text' class='form-control' id="date_payment" name="date_payment" placeholder='Date Payment' ng-model="formdata.date_payment" readonly>
+            <p class="help-block" ng-show="formdata.date_payment_error" ng-bind="formdata.date_payment_error[0]"></p>
           </div>
 
           <div class='form-group'>
@@ -301,14 +301,14 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-primary" form="cash-payment-form">Confirm</button>
+        <button type="submit" class="btn btn-primary" form="cash-payment-form"  ng-click="cash_payment()" ng-disabled="submit">Confirm</button>
       </div>
     </div>
 
   </div>
 </div>
 
-
+</div>
 
 @endsection
 
@@ -328,17 +328,42 @@ $(document).ready(function(e) {
 });
 
 
-var app = angular.module('pos', []);
-app.controller('maincontroller', function($scope) {
+var app = angular.module('modals', []);
+app.controller('cashpayment_controller', function($scope,$http) {
+    $scope.formdata = {
+      _token: "{{csrf_token()}}",
+      date_payment: "{{date('m/d/Y') }}",
+      id: {{$sales_dr->orderID }},
+    };
     $scope.total = {{$sales_dr->balance,2}};
-    $scope.amount;
+    $scope.formdata.amount;
     $scope.change = function() {
-      var change = $scope.amount-$scope.total;
+      var change = $scope.formdata.amount-$scope.total;
       if(change<=0){
         change = 0;
       }
       return change;
     };
+
+    $scope.cash_payment = function() {
+      $scope.submit = true;
+      $http({
+          method: 'POST',
+          url: '/sales/payment/cash',
+          data: $.param($scope.formdata),
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      })
+      .then(function(response) {
+          console.log(response.data);
+          location.reload();
+      }, function(rejection) {
+          var errors = rejection.data;
+          $scope.formdata.ar_number_error = errors.ar_number;
+          $scope.formdata.amount_error = errors.amount;
+          $scope.formdata.date_payment_error = errors.date_payment;
+          $scope.submit = false;
+      });
+    }
 });
 </script>
 @endsection

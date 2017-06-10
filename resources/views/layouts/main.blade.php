@@ -19,7 +19,7 @@
 @yield('css')
 </head>
 <body>
-<div ng-app="pos" ng-controller="maincontroller" ng-cloak>
+
 <nav class="navbar navbar-default nav-stacked">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -608,7 +608,6 @@
 
 
 @yield('modals')
-</div>
 <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
 <script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/assets/js/jquery-ui.min.js"></script>

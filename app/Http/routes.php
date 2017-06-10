@@ -18,6 +18,7 @@ Route::post('login','App_controller@login');
 Route::post('settings','App_controller@settings');
 Route::get('logout','App_controller@logout');
 Route::get('test','App_controller@test');
+Route::post('test','App_controller@test');
 
 Route::get('/', 'App_controller@index')->middleware('logged');
 
@@ -73,7 +74,7 @@ Route::post('sales/drcart','Sales_controller@drcart_store')->middleware('logged.
 Route::delete('sales/drcart','Sales_controller@drcart_destroy')->middleware('logged.request');
 Route::get('sales/dr/{id}','Sales_controller@dr')->middleware('logged.request');
 Route::put('sales/dr/{id}','Sales_controller@dr_updateinfo')->middleware('logged.request');
-Route::post('sales/payments/{type}','Sales_controller@dr_payment')->middleware('logged.request');
+Route::post('sales/payment/{type}','Sales_controller@dr_payment')->middleware('logged.request');
 
 
 Route::get('search/items/{arg}','Search_controller@items')->middleware('logged.request');
