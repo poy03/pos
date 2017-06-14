@@ -344,6 +344,26 @@ class Sales_controller extends Controller
       }
       $data["sales_dr"] = $sales_dr;
       // return $sales_dr;
+      $payments = new Payments;
+      $cash_payments = $payments->where("orderID",$orderID);
+      $cash_payments->where("deleted",0);
+      $cash_payments->where("type_payment","cash");
+      if($cash_payments->count()!=0){
+        $data["has_cash_payments"] = TRUE;
+        $data["cash_payments"] = $cash_payments->get();
+      }else{
+        $data["has_cash_payments"] = FALSE;
+      }
+
+      $pdc_payments = $payments->where("orderID",$orderID);
+      $pdc_payments->where("deleted",0);
+      $pdc_payments->where("type_payment","pdc");
+      if($pdc_payments->count()!=0){
+      $data["has_pdc_payments"] = TRUE;
+        $data["pdc_payments"] = $pdc_payments->get();
+      }else{
+        $data["has_pdc_payments"] = FALSE;
+      }
       return view('salesdr_complete',$data); 
     }
 
@@ -357,25 +377,76 @@ class Sales_controller extends Controller
 
     public function dr_payment(Request $request,$type)
     {
+      DB::enableQueryLog();
       $payments = new Payments;
       if($type=="cash"){
         $this->validate($request, [
-          'ar_number' => 'image',
-          'amount' => 'required',
+          'ar_number' => 'required|max:100',
+          'amount' => 'required|numeric',
           'date_payment' => 'required|date',
-          // 'logo' => 'max:500|image',
         ]);
+
+
+        $sales_dr = new Sales_dr;
+        $dr_data = $sales_dr->where("orderID",$request->id)->first();
+        $payments = new Payments;
+        $payments->balance = $dr_data->balance;
+        $payments->type_payment = "cash";
+        $payments->amount = $request->amount;
+        $excess = (($dr_data->balance - $request->amount)>=0?0:$request->amount - $dr_data->balance);
+        $payments->excess = $excess;
+        $payments->ar_number = $request->ar_number;
+        $payments->date_payment = strtotime($request->date_payment);
+        $payments->orderID = $request->id;
+        $payments->accountID = $request->session()->get('user');
+        $payments->save();
+
+        $balance = ($dr_data->balance - $request->amount < 0 ? 0 : $dr_data->balance - $request->amount);
+        $sales_dr->where("orderID",$request->id)->update([
+            'balance' => $balance,
+            'fully_paid' => ($balance==0?1:0),
+          ]);
+      }elseif($type=="pdc"){
+        $this->validate($request, [
+          'ar_number' => 'required|max:100',
+          'pdc_bank' => 'required|max:100',
+          'pdc_check_number' => 'required|max:100',
+          'amount' => 'required|numeric',
+          'pdc_date' => 'required|date',
+        ]);
+
+        $sales_dr = new Sales_dr;
+        $dr_data = $sales_dr->where("orderID",$request->id)->first();
+        $payments = new Payments;
+        $payments->balance = $dr_data->balance;
+        $payments->type_payment = "pdc";
+        $payments->amount = $request->amount;
+        $excess = (($dr_data->balance - $request->amount)>=0?0:$request->amount - $dr_data->balance);
+        $payments->excess = $excess;
+        $payments->ar_number = $request->ar_number;
+        $payments->pdc_check_number = $request->pdc_check_number;
+        $payments->pdc_bank = $request->pdc_bank;
+        $payments->pdc_date = strtotime($request->pdc_date);
+        $payments->date_payment = strtotime($request->date_payment);
+        $payments->orderID = $request->id;
+        $payments->accountID = $request->session()->get('user');
+        $payments->save();
+      }elseif($type=="check_deposit"){
+
+        $payments = new Payments;
+        $payments_data = $payments->where("paymentID",$request->id)->first();
+        $payments->where("paymentID",$request->id)->update([
+            'status' => 'Deposited on '.date("m/d/Y"),
+          ]);
+        $sales_dr = new Sales_dr;
+        $dr_data = $sales_dr->where("orderID",$payments_data->orderID)->first();
+
+        $balance = ($dr_data->balance - $payments_data->amount < 0 ? 0 : $dr_data->balance - $payments_data->amount);
+        $sales_dr->where("orderID",$payments_data->orderID)->update([
+            'balance' => $balance,
+            'fully_paid' => ($balance==0?1:0),
+          ]);
       }
-      return $request->ar_number;
+
     }
-
-    /*
-
-https://www.google.com.ph/search?q=I+Wait+For+The+Moment+That+You+Love+Me&oq=I+Wait+For+The+Moment+That+You+Love+Me&aqs=chrome..69i57.409j0j1&sourceid=chrome&ie=UTF-8
-
-https://myanimelist.net/anime/28725/Kokoro_ga_Sakebitagatterunda
-
-https://www.google.com.ph/search?q=Closely+linked+to+the+stars+anime&oq=Closely+linked+to+the+stars+anime&aqs=chrome..69i57.1915j0j1&sourceid=chrome&ie=UTF-8#q=Kuttsukiboshi
-
-    */
 }

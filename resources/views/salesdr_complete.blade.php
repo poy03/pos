@@ -49,7 +49,7 @@
 @endsection
 
 @section('content')
-<div class='col-md-12'>
+<div class='col-md-12' ng-controller="main_controller">
     <center class='davao' style='font-size:16pt;font-weight:bold;'><u>{{ $app->app_company_name }}</u></center>
     <center style='font-size:12pt;text-align:center'>{{ $app->address }}</center>
     <center style='font-size:12pt;text-align:center;margin-bottom: 5pt;'>TEL. <i class='fa fa-phone' aria-hidden='true'></i> {{ $app->contact_number }}</center>
@@ -238,75 +238,207 @@
         <button type="button" class="btn btn-info" id="dr-print">
           <span class="glyphicon glyphicon-print"></span> Print
         </button>
+        @if($sales_dr->fully_paid==0)
         <button type="button" class="btn btn-success" id="dr-paycash" onclick="$('#cash-payment-modal').modal('show')">
           <span class="glyphicon glyphicon-shopping-cart"></span> Cash Payment
         </button>
-        <button type="button" class="btn btn-success" id="dr-paypdc">
+        <button type="button" class="btn btn-success" id="dr-paypdc" onclick="$('#pdc-payment-modal').modal('show')">
           <span class="glyphicon glyphicon-calendar"></span> PDC Payment
         </button>
+        @endif
         <button type="button" class="btn btn-primary" id="dr-itemreturn">
           <span class="glyphicon glyphicon-edit"></span> Return Items
         </button>
       </div>
+
+      <table border="1" style="width: 100%">
+        <tbody>
+          @if($has_cash_payments)
+          <tr>
+            <th colspan="20" style="text-align: center;">Cash Payments</th>
+          </tr>
+          <tr>
+            <th style="text-align: center;">AR #</th>
+            <th style="text-align: center;">Date of Payment</th>
+            <th style="text-align: center;">Balance</th>
+            <th style="text-align: center;">Cash Amount</th>
+            <th style="text-align: center;">Change</th>
+            <th style="text-align: center;">Remaining Balance</th>
+          </tr>
+            @foreach($cash_payments as $cash_payment_data)
+            <tr>
+              <td style="text-align: center;">{{ $cash_payment_data->ar_number }}</td>
+              <td style="text-align: center;">{{ date("m/d/Y",$cash_payment_data->date_payment) }}</td>
+              <td style="text-align: right;">{{ number_format($cash_payment_data->balance,2) }}</td>
+              <td style="text-align: right;">{{ number_format($cash_payment_data->amount,2) }}</td>
+              <td style="text-align: right;">{{ number_format($cash_payment_data->excess,2) }}</td>
+              <td style="text-align: right;">{{ number_format(($cash_payment_data->balance-$cash_payment_data->amount>=0?$cash_payment_data->balance-$cash_payment_data->amount:0),2) }}</td>
+            </tr>
+            @endforeach
+          @endif
+          <tr>
+            <th colspan="20" style="text-align: center;">&nbsp;</th>
+          </tr>
+
+          @if($has_pdc_payments)
+          <tr>
+            <th colspan="20" style="text-align: center;">PDC Payments</th>
+          </tr>
+          <tr>
+            <th style="text-align: center;">AR #</th>
+            <th style="text-align: center;">PDC Date</th>
+            <th style="text-align: center;">Bank Name</th>
+            <th style="text-align: center;">PDC Check</th>
+            <th style="text-align: center;">PDC Amount</th>
+            <th style="text-align: center;">Cheque Status</th>
+          </tr>
+            @foreach($pdc_payments as $pdc_payment_data)
+            <tr>
+              <td style="text-align: center;">{{ $pdc_payment_data->ar_number }}</td>
+              <td style="text-align: center;">{{ date("m/d/Y",$pdc_payment_data->pdc_date) }}</td>
+              <td style="text-align: center;">{{ $pdc_payment_data->pdc_bank }}</td>
+              <td style="text-align: center;">{{ $pdc_payment_data->pdc_check_number }}</td>
+              <td style="text-align: right;">{{ number_format($pdc_payment_data->amount,2) }}</td>
+              <td style="text-align: center;">
+                @if($pdc_payment_data->pdc_returned == 0 && $pdc_payment_data->status == "")
+                  <button class="btn-danger" ng-click="check_return({{$pdc_payment_data->paymentID}})">Cheque is Returned</button>
+                  <button class="btn-success" ng-click="check_deposit({{$pdc_payment_data->paymentID}})">Cheque is Deposited</button>
+                @else
+                  {{ $pdc_payment_data->status }}
+                @endif
+              </td>
+            </tr>
+            @endforeach
+          @endif
+        </tbody>
+      </table>
   </div>
 </div>
 
 @endsection
 
 @section('modals')
-<div ng-app="modals">
-<!--Cash Payment Modal -->
-<div id="cash-payment-modal" class="modal fade" role="dialog" tabindex="-1" ng-controller="cashpayment_controller">
-  <div class="modal-dialog">
+<div>
+  <!--Cash Payment Modal -->
+  <div id="cash-payment-modal" class="modal fade" role="dialog" tabindex="-1" ng-controller="cashpayment_controller">
+    <div class="modal-dialog">
 
-    <!-- Modal content-->
-    <div class="modal-content">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h4 class="modal-title">Cash Payment</h4>
-    </div>
-      <div class="modal-body">
-        <form action="/sales/payment/cash" method="post" class="form" id="cash-payment-form">
-          {{ csrf_field() }}
-          <input type="hidden" name="type" value="cash">
-          <div class='form-group'>
-            <label for="total">Total:</label>
-            <input type='text' class='form-control' value="@{{total|currency:''}}" readonly>
-          </div>
-
-          <div class='form-group'>
-            <label for="amount">Amount:</label>
-            <input type='number' step="0.01" class='form-control' id="amount" name="amount" placeholder='Amount' ng-model="formdata.amount" autocomplete='off'>
-            <p class="help-block" ng-show="formdata.amount_error" ng-bind="formdata.amount_error[0]"></p>
-          </div>
-
-          <div class='form-group'>
-            <label for="ar_number">AR Number:</label>
-            <input type='text' class='form-control' id="ar_number" name="ar_number" placeholder='AR Number' autocomplete='off' ng-model="formdata.ar_number">
-            <p class="help-block" ng-show="formdata.ar_number_error" ng-bind="formdata.ar_number_error[0]"></p>
-          </div>
-
-          <div class='form-group'>
-            <label for="date_payment">Date Payment:</label>
-            <input type='text' class='form-control' id="date_payment" name="date_payment" placeholder='Date Payment' ng-model="formdata.date_payment" readonly>
-            <p class="help-block" ng-show="formdata.date_payment_error" ng-bind="formdata.date_payment_error[0]"></p>
-          </div>
-
-          <div class='form-group'>
-            <label for="change">Change:</label>
-            <input type='text' class='form-control' id="change" placeholder="Change" value="@{{change()|currency:''}}" readonly>
-          </div>
-
-        </form>
+      <!-- Modal content-->
+      <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Cash Payment</h4>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-primary" form="cash-payment-form"  ng-click="cash_payment()" ng-disabled="submit">Confirm</button>
-      </div>
-    </div>
+        <div class="modal-body">
+          <form action="/sales/payment/cash" method="post" class="form" id="cash-payment-form">
+            {{ csrf_field() }}
+            <input type="hidden" name="type" value="cash">
+            <div class='form-group'>
+              <label for="total">Total:</label>
+              <input type='text' class='form-control' value="@{{total|currency:''}}" readonly>
+            </div>
 
+            <div class='form-group'>
+              <label for="amount">Amount:</label>
+              <input type='number' step="0.01" class='form-control' id="amount" name="amount" placeholder='Amount' ng-model="formdata.amount" autocomplete='off'>
+              <p class="help-block" ng-show="formdata.amount_error" ng-bind="formdata.amount_error[0]"></p>
+            </div>
+
+            <div class='form-group'>
+              <label for="ar_number">AR Number:</label>
+              <input type='text' class='form-control' id="ar_number" name="ar_number" placeholder='AR Number' autocomplete='off' ng-model="formdata.ar_number">
+              <p class="help-block" ng-show="formdata.ar_number_error" ng-bind="formdata.ar_number_error[0]"></p>
+            </div>
+
+            <div class='form-group'>
+              <label for="date_payment">Date Payment:</label>
+              <input type='text' class='form-control' id="date_payment" name="date_payment" placeholder='Date Payment' ng-model="formdata.date_payment" readonly>
+              <p class="help-block" ng-show="formdata.date_payment_error" ng-bind="formdata.date_payment_error[0]"></p>
+            </div>
+
+            <div class='form-group'>
+              <label for="change">Change:</label>
+              <input type='text' class='form-control' id="change" placeholder="Change" value="@{{change()|currency:''}}" readonly>
+            </div>
+
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" form="cash-payment-form"  ng-click="cash_payment()" ng-disabled="submit">Confirm</button>
+        </div>
+      </div>
+
+    </div>
   </div>
-</div>
+
+
+  <div id="pdc-payment-modal" class="modal fade" role="dialog" tabindex="-1" ng-controller="pdcpayment_controller">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Cash Payment</h4>
+        </div>
+        <div class="modal-body">
+          <form action="/sales/payment/pdc" method="post" class="form" id="pdc-payment-form">
+            {{ csrf_field() }}
+            <input type="hidden" name="type" value="pdc">
+            <div class='form-group'>
+              <label for="total">Total:</label>
+              <input type='text' class='form-control' value="@{{total|currency:''}}" readonly>
+            </div>
+
+            <div class='form-group'>
+              <label for="pdc_date">PDC Date:</label>
+              <input type='text' class='form-control' id="pdc_date" name="pdc_date" placeholder='pdc_date' ng-model="formdata.pdc_date" readonly>
+              <p class="help-block" ng-show="formdata.pdc_date_error" ng-bind="formdata.pdc_date_error[0]"></p>
+            </div>
+
+            <div class='form-group'>
+              <label for="pdc_bank">Bank:</label>
+              <input type='text' class='form-control' name="pdc_bank" placeholder='pdc_bank' ng-model="formdata.pdc_bank">
+              <p class="help-block" ng-show="formdata.pdc_bank_error" ng-bind="formdata.pdc_bank_error[0]"></p>
+            </div>
+
+            <div class='form-group'>
+              <label for="pdc_check_number">pdc_check_number:</label>
+              <input type='text' class='form-control' name="pdc_check_number" placeholder='pdc_check_number' ng-model="formdata.pdc_check_number">
+              <p class="help-block" ng-show="formdata.pdc_check_number_error" ng-bind="formdata.pdc_check_number_error[0]"></p>
+            </div>
+
+
+            <div class='form-group'>
+              <label for="amount">PDC Amount:</label>
+              <input type='number' step="0.01" class='form-control' id="amount" name="amount" placeholder='Amount' ng-model="formdata.amount" autocomplete='off'>
+              <p class="help-block" ng-show="formdata.amount_error" ng-bind="formdata.amount_error[0]"></p>
+            </div>
+
+            <div class='form-group'>
+              <label for="ar_number">AR Number:</label>
+              <input type='text' class='form-control' id="ar_number" name="ar_number" placeholder='AR Number' autocomplete='off' ng-model="formdata.ar_number">
+              <p class="help-block" ng-show="formdata.ar_number_error" ng-bind="formdata.ar_number_error[0]"></p>
+            </div>
+
+            <div class='form-group'>
+              <label for="date_payment">Date Payment:</label>
+              <input type='text' class='form-control' id="date_payment" name="date_payment" placeholder='Date Payment' ng-model="formdata.date_payment" readonly>
+              <p class="help-block" ng-show="formdata.date_payment_error" ng-bind="formdata.date_payment_error[0]"></p>
+            </div>
+
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" form="pdc-payment-form"  ng-click="cash_payment()" ng-disabled="submit">Confirm</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 
 </div>
 
@@ -316,7 +448,7 @@
 <script type="text/javascript">
 $(document).ready(function(e) {
   var orderID = {{ $sales_dr->orderID }};
-  $("#date_delivered,#date_payment").datepicker();
+  $("#date_delivered,#date_payment,#pdc_date").datepicker();
   $(document).on("change keyup",".update_dr",function(e) {
     $.ajax({
       type: "PUT",
@@ -365,5 +497,59 @@ app.controller('cashpayment_controller', function($scope,$http) {
       });
     }
 });
+
+app.controller('pdcpayment_controller', function($scope,$http) {
+    $scope.formdata = {
+      _token: "{{csrf_token()}}",
+      date_payment: "{{date('m/d/Y') }}",
+      pdc_date: "{{date('m/d/Y') }}",
+      id: {{$sales_dr->orderID }},
+    };
+    $scope.total = {{$sales_dr->balance,2}};
+    $scope.formdata.amount;
+    $scope.cash_payment = function() {
+      $scope.submit = true;
+      $http({
+          method: 'POST',
+          url: '/sales/payment/pdc',
+          data: $.param($scope.formdata),
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      })
+      .then(function(response) {
+          console.log(response.data);
+          location.reload();
+      }, function(rejection) {
+          var errors = rejection.data;
+          $scope.formdata.ar_number_error = errors.ar_number;
+          $scope.formdata.amount_error = errors.amount;
+          $scope.formdata.date_payment_error = errors.date_payment;
+          $scope.submit = false;
+      });
+    }
+});
+
+app.controller('main_controller',function($scope,$http) {
+      $scope.check_deposit = function(id) {
+        // console.log(prop);
+        $http({
+            method: 'POST',
+            url: '/sales/payment/check_deposit',
+            data: $.param({
+                id: id,
+                _token: "{{csrf_token()}}",
+              }),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
+        })
+        .then(function(response) {
+          // console.log(response.data);
+            location.reload();
+        }, function(rejection) {
+            console.log(rejection);
+        });
+      };
+});
+
+angular.bootstrap(document, ['modals']);
+
 </script>
 @endsection
