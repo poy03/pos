@@ -1,8 +1,9 @@
 <?php
 
-	function paging($page,$num_items,$maxitem,$class="",$pre='<tr><td colspan="200" style="text-align:center">',$post='</td></tr>')
+	function paging($page,$num_items,$maxitem,$class="",$attrib="",$pre="",$post="")
 	{
-
+		$pre = ($pre==""?'<tr><td colspan="200" style="text-align:center">':$pre);
+		$post = ($post==""?'</td></tr>':$post);
 		if($num_items==0){
 			$paging = "";
 			$paging .= $pre;

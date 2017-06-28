@@ -59,8 +59,12 @@ Route::put('users/user/{id}','Users_controller@update')->middleware('logged.requ
 Route::post('users','Users_controller@store')->middleware('logged.request');
 
 Route::get('reports','Reports_controller@index')->middleware('logged');
-Route::get('receivables/{tab}','Ar_controller@index')->middleware('logged');
+Route::get('receivables/ar','Ar_controller@index')->middleware('logged');
+Route::get('receivables/ar/list','Ar_controller@ar_list')->middleware('logged');
+Route::get('receivables/due','Ar_controller@index')->middleware('logged');
 Route::get('receivables','Ar_controller@index')->middleware('logged');
+
+
 Route::get('payables','Ap_controller@index')->middleware('logged');
 Route::get('expenses','Expenses_controller@index')->middleware('logged');
 

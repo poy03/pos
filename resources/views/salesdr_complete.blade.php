@@ -460,7 +460,7 @@ $(document).ready(function(e) {
 });
 
 
-var app = angular.module('modals', []);
+var app = angular.module('main', []);
 app.controller('cashpayment_controller', function($scope,$http) {
     $scope.formdata = {
       _token: "{{csrf_token()}}",
@@ -549,7 +549,7 @@ app.controller('main_controller',function($scope,$http) {
       };
 });
 
-angular.bootstrap(document, ['modals']);
+angular.bootstrap(document, ['main']);
 
 </script>
 @endsection

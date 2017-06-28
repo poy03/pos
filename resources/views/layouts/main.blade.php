@@ -617,6 +617,7 @@
 <script type="text/javascript" src="/assets/js/moment.js"></script>
 <script type="text/javascript" src="/assets/js/alertify.js"></script>
 <script type="text/javascript" src="/assets/js/angular.min.js"></script>
+<script type="text/javascript" src="/assets/js/angular-sanitize.js"></script>
 <script type="text/javascript" src="/assets/js/core.js"></script>
 
 @yield('scripts')
